@@ -1,0 +1,119 @@
+body {
+    margin: 0;
+    background: #f4f5f8;
+    font-family: Arial, sans-serif;
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.header h1 {
+    color: #062a5b;
+    margin-bottom: 5px;
+}
+
+.header p {
+    color: #555;
+    font-size: 14px;
+}
+
+.login-card {
+    width: 380px;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 25px;
+    margin-top: 30px;
+}
+
+.login-card h2 {
+    margin-bottom: 5px;
+    color: #062a5b;
+}
+
+.login-card small {
+    font-weight: bold;
+    color: #333;
+}
+
+.input-group {
+    margin-top: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    text-align:left;
+}
+
+.input-group input {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+.input-box{
+    position: relative;
+}
+
+.input-box input{
+    width: 100%;
+    height: 45px;
+    padding-left: 40px;
+    padding-right: 40px;
+    box-sizing: border-box;
+}
+.input-icon{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.eye-icon{
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    cursor: pointer;
+}
+
+.forgot {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.forgot a {
+    color: #00ddff;
+}
+
+.signin-btn {
+    width: 100%;
+    height: 45px;
+    border: none;
+    background: #062a5b;
+    color: white;
+    font-weight: bold;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.signup {
+    text-align: center;
+    margin-top: 20px;
+}
+.signup a{
+    color:#00ddff;
+    text-decoration:underline;
+}
