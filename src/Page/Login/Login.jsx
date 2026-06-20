@@ -1,6 +1,7 @@
 import "./Login.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import authService from "../../Services/authService";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
@@ -8,6 +9,7 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -15,31 +17,36 @@ function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(
-                "http://localhost:8080/auth/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        email: email.trim(),
-                        password: password.trim()
-                    })
-                }
-            );
+            const data = await authService.login({
+                email: email.trim(),
+                password: password.trim()
+            });
 
-            const data = await response.json().catch(() => ({}));
+            if (data.code === 1000 && data.result?.token) {
 
-            if (response.ok && data?.code === 1000 && data?.result?.token) {
-                localStorage.setItem("token", data.result.token);
+                localStorage.setItem(
+                    "token",
+                    data.result.token
+                );
+
+                localStorage.setItem(
+                    "role",
+                    data.result.role
+                );
+
                 navigate("/dashboard");
+
             } else {
-                setError(data?.message || "Email or password is wrong try again!");
+                setError(
+                    data.message || "Email or password is wrong!"
+                );
             }
 
-        } catch (e) {
-            setError("Email or password is wrong try again!");
+        } catch (error) {
+            setError(
+                error.response?.data?.message ||
+                "Email or password is wrong!"
+            );
         } finally {
             setLoading(false);
         }
@@ -57,8 +64,10 @@ function Login() {
 
                 <div className="input-group">
                     <label>Email</label>
+
                     <div className="input-box">
                         <i className="fa-regular fa-envelope input-icon"></i>
+
                         <input
                             type="email"
                             placeholder="Email"
@@ -70,16 +79,23 @@ function Login() {
 
                 <div className="input-group">
                     <label>Password</label>
+
                     <div className="input-box">
                         <i className="fa-solid fa-lock input-icon"></i>
+
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+
                         <i
-                            className={`eye-icon ${showPassword ? "fa-regular fa-eye-slash" : "fa-regular fa-eye"}`}
+                            className={`eye-icon ${
+                                showPassword
+                                    ? "fa-regular fa-eye-slash"
+                                    : "fa-regular fa-eye"
+                            }`}
                             onClick={() => setShowPassword(!showPassword)}
                         ></i>
                     </div>
@@ -91,14 +107,18 @@ function Login() {
                     </Link>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
+                {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}
 
                 <button
                     className="signin-btn"
                     onClick={handleLogin}
                     disabled={loading}
                 >
-                    {loading ? 'Signing in...' : 'SIGN IN'}
+                    {loading ? "Signing in..." : "SIGN IN"}
                 </button>
 
                 <div className="signup">

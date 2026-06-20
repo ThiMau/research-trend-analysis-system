@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import authService from "../../Services/authService";
 import "./OTPVerification.css";
 
 
@@ -23,7 +23,20 @@ function OTPVerification() {
 
 
 
+    // Verify OTP
     const handleVerify = async () => {
+
+
+        if (!otp) {
+
+            setMessage(
+                "Please enter OTP"
+            );
+
+            return;
+
+        }
+
 
 
         try {
@@ -31,21 +44,21 @@ function OTPVerification() {
 
             setLoading(true);
 
-
-            const res = await axios.post(
-                "/api/auth/verify-otp",
-                {
-                    email: email,
-                    otp: otp
-                }
-            );
-
-
-            console.log(res.data);
+            setMessage("");
 
 
 
-            // sau này chuyển sang reset password
+            await authService.verifyOTP({
+
+                email: email,
+
+                otp: otp
+
+            });
+
+
+
+            // chuyển sang trang reset password
             navigate("/reset-password");
 
 
@@ -54,22 +67,29 @@ function OTPVerification() {
 
 
             setMessage(
-                error.response?.data?.message ||
+
+                error.response?.data?.message
+                ||
                 "Invalid OTP"
+
             );
 
 
         } finally {
 
+
             setLoading(false);
+
 
         }
 
 
-    }
+    };
 
 
 
+
+    // Gửi lại OTP
     const retryOTP = async () => {
 
 
@@ -78,13 +98,14 @@ function OTPVerification() {
 
             setLoading(true);
 
+            setMessage("");
 
-            await axios.post(
-                "/api/auth/forgot-password",
-                {
-                    email: email
-                }
+
+
+            await authService.forgotPassword(
+                email
             );
+
 
 
             setMessage(
@@ -92,20 +113,27 @@ function OTPVerification() {
             );
 
 
+
         } catch (error) {
+
 
             setMessage(
                 "Cannot resend OTP"
             );
 
+
         } finally {
 
+
             setLoading(false);
+
 
         }
 
 
-    }
+    };
+
+
 
 
 
@@ -117,6 +145,7 @@ function OTPVerification() {
             <div className="otp-card">
 
 
+
                 <h1>
                     Enter OTP
                 </h1>
@@ -126,83 +155,130 @@ function OTPVerification() {
                 <p>
                     Enter the code sent to
                     <br />
-                    <b>{email}</b>
+
+                    <b>
+                        {email}
+                    </b>
+
                 </p>
+
 
 
 
                 <input
 
+
                     type="text"
+
 
                     placeholder="Enter OTP"
 
+
                     value={otp}
 
+
                     onChange={
-                        e => setOtp(e.target.value)
+                        (e) =>
+                            setOtp(e.target.value)
                     }
+
 
                 />
 
 
 
+
                 <button
+
                     onClick={handleVerify}
+
                     disabled={loading}
+
                 >
 
-                    ENTER
+                    {
+                        loading
+                            ?
+                            "VERIFYING..."
+                            :
+                            "ENTER"
+                    }
+
 
                 </button>
 
 
 
 
+
                 <button
+
                     onClick={retryOTP}
+
+                    disabled={loading}
+
                 >
 
                     RETRY
 
+
                 </button>
+
+
 
 
 
 
                 <p className="change-email">
 
+
                     Want to change email ?
 
+
+
                     <span
+
                         onClick={() =>
                             navigate("/forgot-password")
                         }
+
                     >
 
                         Click here
 
+
                     </span>
+
 
                 </p>
 
 
 
+
+
                 {
+
                     message &&
+
                     <p>
+
                         {message}
+
                     </p>
+
                 }
+
+
 
 
 
             </div>
 
 
+
         </div>
 
-    )
+    );
 
 
 }

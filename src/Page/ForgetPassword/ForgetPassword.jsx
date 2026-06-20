@@ -1,67 +1,57 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import authService from "../../Services/authService";
 import "./ForgetPassword.css";
 
-
 function ForgetPassword() {
-
     const navigate = useNavigate();
-
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
-
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         if (!email) {
-
-            setMessage("Please enter your email");
-
+            setMessage(
+                "Please enter your email"
+            );
             return;
         }
 
         try {
-
             setLoading(true);
             setMessage("");
+            await authService.forgotPassword(email);
 
-            await axios.post(
-                "/api/auth/forgot-password",
-                {
-                    email: email
-                }
-            );
-
-            // lưu email cho trang OTP
             sessionStorage.setItem(
                 "resetEmail",
                 email
             );
 
-            // chuyển sang trang OTP
             navigate("/verify-email");
 
         } catch (error) {
 
             setMessage(
-                error.response?.data?.message ||
+
+                error.response?.data?.message
+                ||
                 "Failed to send email"
+
             );
 
         } finally {
 
             setLoading(false);
-
         }
 
     };
 
-    return (
 
+
+    return (
         <div className="reset-page">
 
             <div className="reset-card">
@@ -143,8 +133,10 @@ function ForgetPassword() {
             </div>
 
         </div>
-
     );
+
+
 }
+
 
 export default ForgetPassword;
