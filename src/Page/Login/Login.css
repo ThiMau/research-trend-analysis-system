@@ -52,41 +52,62 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
-    text-align:left;
+    text-align: left;
 }
-
-.input-group input {
-    width: 100%;
-    height: 40px;
-    box-sizing: border-box;
-    padding: 0 10px;
-}
-.input-box{
+.input-box {
     position: relative;
+    width: 100%;
+    display: block;
 }
 
-.input-box input{
+.input-box input {
     width: 100%;
     height: 45px;
-    padding-left: 40px;
-    padding-right: 40px;
     box-sizing: border-box;
-}
-.input-icon{
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
+    /* Khoảng trống bên trái vừa đủ cho icon (16px lề + 22px chiều rộng icon + 12px khoảng cách chữ) */
+    padding-left: 50px; 
+    padding-right: 45px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #111827;
+    outline: none;
+    text-align: left; /* Đảm bảo text luôn canh trái kể cả bị ảnh hưởng bởi index.css */
 }
 
-.eye-icon{
+.input-box input::placeholder {
+    color: #9ca3af;
+}
+
+.input-box input:focus {
+    border-color: #062a5b;
+}
+
+.input-icon {
     position: absolute;
-    right: 12px;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 16px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: #666;
+    font-size: 16px;
     cursor: pointer;
+    z-index: 5;
 }
 
 .forgot {
@@ -96,6 +117,12 @@ body {
 
 .forgot a {
     color: #00ddff;
+    text-decoration: none;
+
+}
+
+.forgot a:hover {
+    text-decoration: underline;
 }
 
 .signin-btn {
@@ -109,21 +136,26 @@ body {
     cursor: pointer;
 }
 
-.error-message{
-    margin-top:12px;
-    color:#b91c1c;
-    background:#fff1f2;
-    border:1px solid #fecaca;
-    padding:8px 10px;
-    border-radius:6px;
-    font-weight:600;
+.error-message {
+    margin-top: 12px;
+    color: #b91c1c;
+    background: #fff1f2;
+    border: 1px solid #fecaca;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-weight: 600;
 }
 
 .signup {
     text-align: center;
     margin-top: 20px;
 }
-.signup a{
-    color:#00ddff;
-    text-decoration:underline;
+
+.signup a {
+    color: #00ddff;
+    text-decoration: none;
+}
+
+.signup a:hover {
+    text-decoration: underline;
 }
