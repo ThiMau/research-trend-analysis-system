@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../../Services/authService";
 import "./OTPVerification.css";
@@ -15,23 +15,133 @@ function OTPVerification() {
     );
 
 
-    const [otp, setOtp] = useState("");
+    const [otp, setOtp] = useState(
+        [
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    );
+
 
     const [loading, setLoading] = useState(false);
 
     const [message, setMessage] = useState("");
 
+    const [timer, setTimer] = useState(57);
 
 
-    // Verify OTP
-    const handleVerify = async () => {
+    const inputRefs = useRef([]);
 
 
-        if (!otp) {
+
+
+    // countdown resend OTP
+    useEffect(()=>{
+
+
+        if(timer <= 0)
+            return;
+
+
+
+        const interval = setInterval(()=>{
+
+
+            setTimer(
+                prev => prev - 1
+            );
+
+
+        },1000);
+
+
+
+        return ()=>clearInterval(interval);
+
+
+
+    },[timer]);
+
+
+
+
+
+
+    const handleChange = (value,index)=>{
+
+
+        if(!/^[0-9]*$/.test(value))
+            return;
+
+
+
+        const newOTP = [...otp];
+
+
+        newOTP[index] = value;
+
+
+        setOtp(newOTP);
+
+
+
+        if(
+            value &&
+            index < 5
+        ){
+
+            inputRefs.current[index+1].focus();
+
+        }
+
+
+    };
+
+
+
+
+
+
+    const handleKeyDown = (e,index)=>{
+
+
+        if(
+            e.key === "Backspace" &&
+            !otp[index] &&
+            index > 0
+        ){
+
+            inputRefs.current[index-1].focus();
+
+        }
+
+
+    };
+
+
+
+
+
+
+
+    const handleVerify = async()=>{
+
+
+        const otpCode = otp.join("");
+
+
+
+        if(otpCode.length !== 6){
+
 
             setMessage(
-                "Please enter OTP"
+                "Please enter 6 digit OTP"
             );
+
 
             return;
 
@@ -39,7 +149,8 @@ function OTPVerification() {
 
 
 
-        try {
+
+        try{
 
 
             setLoading(true);
@@ -50,20 +161,23 @@ function OTPVerification() {
 
             await authService.verifyOTP({
 
-                email: email,
+                email:email,
 
-                otp: otp
+                otp:otpCode
 
             });
 
 
 
-            // chuyển sang trang reset password
-            navigate("/reset-password");
+
+            navigate(
+                "/reset-password"
+            );
 
 
 
-        } catch (error) {
+        }
+        catch(error){
 
 
             setMessage(
@@ -75,7 +189,8 @@ function OTPVerification() {
             );
 
 
-        } finally {
+        }
+        finally{
 
 
             setLoading(false);
@@ -89,16 +204,21 @@ function OTPVerification() {
 
 
 
-    // Gửi lại OTP
-    const retryOTP = async () => {
 
 
-        try {
+
+    const resendOTP = async()=>{
+
+
+        if(timer > 0)
+            return;
+
+
+
+        try{
 
 
             setLoading(true);
-
-            setMessage("");
 
 
 
@@ -108,13 +228,18 @@ function OTPVerification() {
 
 
 
+            setTimer(57);
+
+
+
             setMessage(
                 "OTP has been resent"
             );
 
 
 
-        } catch (error) {
+        }
+        catch(error){
 
 
             setMessage(
@@ -122,7 +247,8 @@ function OTPVerification() {
             );
 
 
-        } finally {
+        }
+        finally{
 
 
             setLoading(false);
@@ -132,6 +258,9 @@ function OTPVerification() {
 
 
     };
+
+
+
 
 
 
@@ -142,53 +271,109 @@ function OTPVerification() {
         <div className="otp-page">
 
 
+            <div className="otp-brand">
+
+
+                <div className="brand-icon">
+                    ▣
+                </div>
+
+
+                <h2>
+                    TrendTrack
+                </h2>
+
+
+                <span>
+                    ACADEMIC INSIGHTS PLATFORM
+                </span>
+
+
+            </div>
+
+
+
+
+
             <div className="otp-card">
 
 
 
                 <h1>
-                    Enter OTP
+                    Verify Email
                 </h1>
 
 
 
-                <p>
-                    Enter the code sent to
-                    <br />
+                <p className="otp-description">
 
-                    <b>
-                        {email}
-                    </b>
+                    We've sent a 6-digit code to your email.
+                    Please enter it below to verify your account.
 
                 </p>
 
 
 
 
-                <input
+
+                <div className="otp-input-container">
 
 
-                    type="text"
+                    {
+                        otp.map(
+                            (item,index)=>(
+
+                                <input
+
+                                    key={index}
+
+                                    ref={
+                                        el =>
+                                        inputRefs.current[index]=el
+                                    }
+
+                                    type="text"
+
+                                    maxLength="1"
+
+                                    value={item}
+
+                                    onChange={
+                                        e =>
+                                        handleChange(
+                                            e.target.value,
+                                            index
+                                        )
+                                    }
 
 
-                    placeholder="Enter OTP"
+                                    onKeyDown={
+                                        e =>
+                                        handleKeyDown(
+                                            e,
+                                            index
+                                        )
+                                    }
 
 
-                    value={otp}
+                                />
 
-
-                    onChange={
-                        (e) =>
-                            setOtp(e.target.value)
+                            )
+                        )
                     }
 
 
-                />
+
+                </div>
+
+
 
 
 
 
                 <button
+
+                    className="verify-btn"
 
                     onClick={handleVerify}
 
@@ -198,10 +383,10 @@ function OTPVerification() {
 
                     {
                         loading
-                            ?
-                            "VERIFYING..."
-                            :
-                            "ENTER"
+                        ?
+                        "VERIFYING..."
+                        :
+                        "VERIFY"
                     }
 
 
@@ -211,15 +396,44 @@ function OTPVerification() {
 
 
 
+
+
+                <div className="divider"></div>
+
+
+
+
+
+
+                <p className="resend-text">
+
+                    Didn't receive a code?
+
+
+                </p>
+
+
+
+
+
                 <button
 
-                    onClick={retryOTP}
+                    className="resend-btn"
 
-                    disabled={loading}
+                    onClick={resendOTP}
+
+                    disabled={timer > 0}
 
                 >
 
-                    RETRY
+
+                    {
+                        timer > 0
+                        ?
+                        `Resend code in 0:${timer}`
+                        :
+                        "Resend code"
+                    }
 
 
                 </button>
@@ -229,25 +443,15 @@ function OTPVerification() {
 
 
 
-                <p className="change-email">
+                <p className="back-login"
 
+                    onClick={()=>
+                        navigate("/")
+                    }
 
-                    Want to change email ?
+                >
 
-
-
-                    <span
-
-                        onClick={() =>
-                            navigate("/forgot-password")
-                        }
-
-                    >
-
-                        Click here
-
-
-                    </span>
+                    ← Back to Login
 
 
                 </p>
@@ -256,17 +460,18 @@ function OTPVerification() {
 
 
 
-                {
 
+
+                {
                     message &&
 
-                    <p>
+                    <p className="message">
 
                         {message}
 
                     </p>
-
                 }
+
 
 
 
@@ -275,8 +480,8 @@ function OTPVerification() {
             </div>
 
 
-
         </div>
+
 
     );
 
