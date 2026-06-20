@@ -23,39 +23,36 @@ function Login() {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        email: email,
-                        password: password
+                        email: email.trim(),
+                        password: password.trim()
                     })
                 }
             );
 
             const data = await response.json().catch(() => ({}));
 
-            if (response.ok && data && data.result && data.result.token) {
+            if (response.ok && data?.code === 1000 && data?.result?.token) {
                 localStorage.setItem("token", data.result.token);
-                // navigate to Dashboard
                 navigate("/dashboard");
             } else {
-                // show error message requested by user
-                setError("Email or password is wrong try again!");
+                setError(data?.message || "Email or password is wrong try again!");
             }
+
         } catch (e) {
             setError("Email or password is wrong try again!");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     return (
         <div className="login-page">
-
             <div className="header">
                 <h1>TrendTrack</h1>
                 <p>Academic Insights & Publication Analytics</p>
             </div>
 
             <div className="login-card">
-
                 <h2>Log In</h2>
 
                 <div className="input-group">
@@ -73,29 +70,23 @@ function Login() {
 
                 <div className="input-group">
                     <label>Password</label>
-
                     <div className="input-box">
                         <i className="fa-solid fa-lock input-icon"></i>
-
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-
                         <i
-                            className={`eye-icon ${showPassword
-                                ? "fa-regular fa-eye-slash"
-                                : "fa-regular fa-eye"
-                                }`}
+                            className={`eye-icon ${showPassword ? "fa-regular fa-eye-slash" : "fa-regular fa-eye"}`}
                             onClick={() => setShowPassword(!showPassword)}
                         ></i>
                     </div>
                 </div>
 
                 <div className="forgot">
-                    <Link to="/reset-password">
+                    <Link to="/forget-password">
                         <b>Forgot Password ?</b>
                     </Link>
                 </div>
@@ -111,11 +102,12 @@ function Login() {
                 </button>
 
                 <div className="signup">
-                    Don't have an account? <a href="#"><b>Sign Up</b></a>
+                    Don't have an account?{" "}
+                    <Link to="/register">
+                        <b>Sign Up</b>
+                    </Link>
                 </div>
-
             </div>
-
         </div>
     );
 }
