@@ -1,0 +1,92 @@
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  background: #f5f7fc;
+  border-right: 1px solid #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+ 
+
+  padding: 24px 16px;
+}
+
+/* Logo */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.logo-box {
+  width: 42px;
+  height: 42px;
+  background: #183b72;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+}
+
+.logo-section h2 {
+  margin: 0;
+  color: #183b72;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.logo-section span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Menu */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-item {
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 0 14px;
+
+  border-radius: 8px;
+  cursor: pointer;
+
+  color: #374151;
+  transition: all .2s;
+}
+
+.menu-item:hover {
+  background: #eef2ff;
+}
+
+.menu-item.active {
+  background: #183b72;
+  color: white;
+}
+
+/* Bottom */
+
+.bottom-menu {
+  margin-top: auto;
+  border-top: 1px solid #d7dce5;
+  padding-top: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
