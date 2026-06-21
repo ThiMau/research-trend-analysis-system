@@ -1,98 +1,98 @@
+﻿import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import authService from "../../Services/authService";
 import "./ChangePassword.css";
 
+export default function ChangePassword() {
+  const navigate = useNavigate();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-export default function ChangePassword(){
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage("");
 
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setMessage("Please fill in all fields.");
+      return;
+    }
 
-    return (
+    if (newPassword !== confirmPassword) {
+      setMessage("New password and confirmation do not match.");
+      return;
+    }
 
-        <div className="change-password-page">
+    try {
+      setLoading(true);
+      const response = await authService.changePassword({
+        oldPassword: currentPassword,
+        newPassword,
+      });
 
+      if (response?.code === 1000) {
+        setMessage("Password changed successfully.");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1200);
+      } else {
+        setMessage(response?.message || "Password change failed.");
+      }
+    } catch (error) {
+      setMessage(
+        error.response?.data?.message ||
+          "Password change failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className="change-password-card">
+  return (
+    <div className="change-password-page">
+      <div className="change-password-card">
+        <h2>Change Password</h2>
 
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Current Password</label>
+            <input
+              type="password"
+              placeholder="Enter current password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </div>
 
-                <h2>
-                    Change Password
-                </h2>
+          <div className="form-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
 
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
 
+          {message && <p className="error-message">{message}</p>}
 
-                <div className="form-group">
-
-
-                    <label>
-                        Current Password
-                    </label>
-
-
-                    <input
-                        type="password"
-                        placeholder="Enter current password"
-                    />
-
-
-                </div>
-
-
-
-
-                <div className="form-group">
-
-
-                    <label>
-                        New Password
-                    </label>
-
-
-                    <input
-                        type="password"
-                        placeholder="Enter new password"
-                    />
-
-
-                </div>
-
-
-
-
-
-                <div className="form-group">
-
-
-                    <label>
-                        Confirm Password
-                    </label>
-
-
-                    <input
-                        type="password"
-                        placeholder="Confirm new password"
-                    />
-
-
-                </div>
-
-
-
-
-
-                <button className="change-btn">
-
-                    Change Password
-
-                </button>
-
-
-
-            </div>
-
-
-
-        </div>
-
-
-    );
-
-
+          <button className="change-btn" type="submit" disabled={loading}>
+            {loading ? "Processing..." : "Change Password"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }

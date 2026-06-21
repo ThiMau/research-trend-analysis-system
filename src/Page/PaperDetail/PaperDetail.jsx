@@ -8,20 +8,26 @@ const PaperDetail = () => {
 
   const [paper, setPaper] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchPaper();
-  }, []);
+  }, [paperId]);
 
   const fetchPaper = async () => {
     try {
-      const data = await authService.getPaperDetail(
-        paperId
-      );
+      const res = await authService.getPaperDetail(paperId);
+
+      // API returns { code, message, result }
+      const data = res?.result || res;
 
       setPaper(data);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Failed to load paper details. Please try again."
+      );
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -29,6 +35,16 @@ const PaperDetail = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="error-page">
+        <h2>Error</h2>
+        <p>{error}</p>
+        <button onClick={fetchPaper}>Retry</button>
+      </div>
+    );
   }
 
   if (!paper) {

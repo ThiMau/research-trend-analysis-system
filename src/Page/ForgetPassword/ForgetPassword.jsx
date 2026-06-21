@@ -23,7 +23,7 @@ function ForgetPassword() {
         try {
             setLoading(true);
             setMessage("");
-            await authService.forgotPassword(email);
+            await authService.forgotPassword({ email });
 
             sessionStorage.setItem(
                 "resetEmail",
