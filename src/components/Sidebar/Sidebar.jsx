@@ -7,9 +7,20 @@ import {
   FileText,
   HelpCircle,
   Headset,
+  LogOut,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import authService from "../../Services/authService";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authService.logout();
+    // Navigate to login and replace history entry so Back won't return to protected pages
+    window.location.replace("/login");
+  };
+
   return (
     <div className="sidebar">
 
@@ -61,10 +72,14 @@ export default function Sidebar() {
         </div>
 
         <div className="menu-item">
-         <Headset size={18} />
-         <span>Contact Support</span>
+          <Headset size={18} />
+          <span>Contact Support</span>
         </div>
 
+        <div className="menu-item logout-item" onClick={handleLogout}>
+          <LogOut size={18} />
+          <span>Logout</span>
+        </div>
       </div>
     </div>
   );

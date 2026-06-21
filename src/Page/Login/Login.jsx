@@ -1,6 +1,6 @@
 import "./Login.css";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import authService from "../../Services/authService";
 
 function Login() {
@@ -11,6 +11,13 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const redirectMessage =
+      location.state?.message ||
+      new URLSearchParams(location.search).get("message") || "";
+
+    const pageMessage = error || redirectMessage;
 
     const handleLogin = async () => {
         setError("");
@@ -23,19 +30,7 @@ function Login() {
             });
 
             if (data.code === 1000 && data.result?.token) {
-
-                localStorage.setItem(
-                    "token",
-                    data.result.token
-                );
-
-                localStorage.setItem(
-                    "role",
-                    data.result.role
-                );
-
                 navigate("/dashboard");
-
             } else {
                 setError(
                     data.message || "Email or password is wrong!"
@@ -107,9 +102,9 @@ function Login() {
                     </Link>
                 </div>
 
-                {error && (
+                {pageMessage && (
                     <div className="error-message">
-                        {error}
+                        {pageMessage}
                     </div>
                 )}
 
