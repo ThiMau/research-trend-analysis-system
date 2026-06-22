@@ -8,9 +8,7 @@ export default function TrendAnalytic() {
 
   const [totalPublications, setTotalPublications] = useState(0);
   const [keywords, setKeywords] = useState([]);
-  const [monthlyData, setMonthlyData] = useState(
-    Array(12).fill(0)
-  );
+  const [monthlyData, setMonthlyData] = useState(Array(12).fill(0));
 
   useEffect(() => {
     fetchTrendData();
@@ -18,32 +16,29 @@ export default function TrendAnalytic() {
 
   const fetchTrendData = async () => {
     try {
-      const response = await axiosClient.get(
-        "/api/member/papers?page=0&size=100"
-      );
+      const response = await axiosClient.get("/api/member/papers", {
+        params: { page: 0, size: 100 },
+      });
 
-      const paperList = response.result.content || [];
+      const result = response.data?.result;
+      const paperList = result?.content || [];
 
       setPapers(paperList);
-      setTotalPublications(response.result.totalElements);
+      setTotalPublications(result?.totalElements || paperList.length);
 
       // ===== KEYWORDS =====
       const keywordMap = {};
 
       paperList.forEach((paper) => {
         paper.keywords?.forEach((keyword) => {
-          keywordMap[keyword] =
-            (keywordMap[keyword] || 0) + 1;
+          keywordMap[keyword] = (keywordMap[keyword] || 0) + 1;
         });
       });
 
       const topKeywords = Object.entries(keywordMap)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 10)
-        .map(([name, count]) => ({
-          name,
-          count,
-        }));
+        .map(([name, count]) => ({ name, count }));
 
       setKeywords(topKeywords);
 
@@ -52,10 +47,7 @@ export default function TrendAnalytic() {
 
       paperList.forEach((paper) => {
         if (paper.createdAt) {
-          const month = new Date(
-            paper.createdAt
-          ).getMonth();
-
+          const month = new Date(paper.createdAt).getMonth();
           monthly[month]++;
         }
       });
@@ -84,16 +76,11 @@ export default function TrendAnalytic() {
       </div>
 
       <div className="trend-content">
-
-        {/* LEFT */}
         <div className="left-section">
-
           <div className="card">
             <h4>TOTAL PUBLICATIONS</h4>
             <h1>{totalPublications}</h1>
-            <p className="green">
-              Total papers in system
-            </p>
+            <p className="green">Total papers in system</p>
           </div>
 
           <div className="card">
@@ -107,17 +94,12 @@ export default function TrendAnalytic() {
 
             {keywords.length > 0 ? (
               keywords.map((item, index) => (
-                <div
-                  className="keyword-row"
-                  key={index}
-                >
+                <div className="keyword-row" key={index}>
                   <span>
                     {index + 1}. {item.name}
                   </span>
 
-                  <span className="badge">
-                    {item.count}
-                  </span>
+                  <span className="badge">{item.count}</span>
                 </div>
               ))
             ) : (
@@ -126,62 +108,42 @@ export default function TrendAnalytic() {
           </div>
         </div>
 
-        {/* RIGHT */}
         <div className="right-section">
-
           <div className="chart-card">
             <h3>Publication Volume</h3>
 
-            <p>
-              Number of papers created each month
-            </p>
+            <p>Number of papers created each month</p>
 
             <div className="chart">
-              {monthlyData.map(
-                (value, index) => (
-                  <div
-                    className="bar-wrapper"
-                    key={index}
-                  >
-                    <div
-                      className="bar"
-                      style={{
-                        height: `${
-                          value * 15 + 20
-                        }px`,
-                      }}
-                    />
+              {monthlyData.map((value, index) => (
+                <div className="bar-wrapper" key={index}>
+                  <div className="bar" style={{ height: `${value * 15 + 20}px` }} />
 
-                    <span>
-                      {
-                        [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "May",
-                          "Jun",
-                          "Jul",
-                          "Aug",
-                          "Sep",
-                          "Oct",
-                          "Nov",
-                          "Dec",
-                        ][index]
-                      }
-                    </span>
-                  </div>
-                )
-              )}
+                  <span>
+                    {
+                      [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ][index]
+                    }
+                  </span>
+                </div>
+              ))}
             </div>
 
             <div className="chart-footer">
-              <span>
-                ■ Monthly Publications
-              </span>
-              <span>
-                Source: API
-              </span>
+              <span>■ Monthly Publications</span>
+              <span>Source: API</span>
             </div>
           </div>
 
@@ -189,18 +151,11 @@ export default function TrendAnalytic() {
             <div>
               <h4>Research Trend Analysis</h4>
 
-              <p>
-                Data loaded from backend API.
-              </p>
+              <p>Data loaded from backend API.</p>
             </div>
 
-            <button
-              onClick={fetchTrendData}
-            >
-              Refresh
-            </button>
+            <button onClick={fetchTrendData}>Refresh</button>
           </div>
-
         </div>
       </div>
     </div>

@@ -13,7 +13,8 @@ export default function MyLibrary() {
     try {
       const res = await axiosClient.get("/api/member/papers");
 
-      setPapers(res.result.content || []);
+      const list = res.data?.result?.content || [];
+      setPapers(list);
     } catch (err) {
       console.log(err);
     }

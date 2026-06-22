@@ -20,7 +20,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Sidebar from "../components/Sidebar/Sidebar";
 import SearchBar from "../components/SearchBar/SearchBar";
 
-function MainLayout({ children }) {
+function MainLayout({ children, showSearchInput = true }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
@@ -29,11 +29,24 @@ function MainLayout({ children }) {
         style={{
           flex: 1,
           display: "flex",
-          flexDirection: "column",
+          justifyContent: "center",
+          minHeight: "100vh",
+          padding: "5px 0",
         }}
       >
-        <SearchBar />
-        {children}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "80vw",
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            boxSizing: "border-box",
+          }}
+        >
+          <SearchBar showInput={showSearchInput} />
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -84,7 +97,7 @@ function AppRoutes() {
           path="/search"
           element={
             <ProtectedRoute>
-              <MainLayout>
+              <MainLayout showSearchInput={false}>
                 <Search />
               </MainLayout>
             </ProtectedRoute>

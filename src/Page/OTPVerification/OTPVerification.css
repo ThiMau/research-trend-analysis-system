@@ -267,17 +267,17 @@
 
 
 .back-login{
-
-
     margin-top:28px;
-
-    color:#555;
-
+    color:#0f2b62;
     font-size:13px;
-
+    font-weight:700;
+    text-decoration:none;
     cursor:pointer;
+}
 
-
+.back-login:hover{
+    color:#00ddff;
+    text-decoration:underline;
 }
 
 

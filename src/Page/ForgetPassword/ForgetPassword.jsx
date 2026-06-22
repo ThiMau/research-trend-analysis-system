@@ -25,13 +25,9 @@ function ForgetPassword() {
             setMessage("");
             await authService.forgotPassword({ email });
 
-            sessionStorage.setItem(
-                "resetEmail",
-                email
+            setMessage(
+                "Reset link sent. Please check your email and follow the link to update your password."
             );
-
-            navigate("/verify-email");
-
         } catch (error) {
 
             setMessage(

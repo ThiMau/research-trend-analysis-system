@@ -1,5 +1,5 @@
-import React from 'react';
 import './Dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 const stats = [
 	{ label: 'Saved Publications', value: 128 },
@@ -16,9 +16,11 @@ function StatCard({ label, value }) {
 	);
 }
 
-function PaperCard({ title, source, meta, excerpt }) {
+function PaperCard({ paperId, title, source, meta, excerpt }) {
+	const navigate = useNavigate();
+
 	return (
-		<article className="paper-card">
+		<article className="paper-card" onClick={() => navigate(`/papers/${encodeURIComponent(paperId || title)}`)} style={{ cursor: 'pointer' }}>
 			<div className="paper-header">
 				<div className="paper-badge">{source}</div>
 				<div className="paper-date">{meta}</div>
@@ -35,27 +37,30 @@ function PaperCard({ title, source, meta, excerpt }) {
 
 export default function Dashboard() {
 	const suggested = [
-		{
-			title: 'Advancements in Single–Cell CRISPR Screens for Genetic Discovery',
-			source: 'Nature Biotechnology',
-			meta: 'Oct 2024',
-			excerpt:
-				'This study explores the integration of single-cell sequencing with large-scale CRISPR interference to map regulatory landscapes of human fibroblasts...',
-		},
-		{
-			title: 'Large Language Models as Predictive Engines for Molecular Dynamics',
-			source: 'ArXiv',
-			meta: 'Nov 2024',
-			excerpt:
-				'We present a novel architecture that leverages the attention mechanisms of transformers to predict protein folding paths with high temporal resolution...',
-		},
-		{
-			title: 'The Impact of Algorithmic Bias on Genomic Metadata Classification',
-			source: 'Cell Systems',
-			meta: 'Sept 2024',
-			excerpt:
-				'Meta-analysis of cross-institutional datasets reveals systematic biases in automated labeling protocols for rare genetic variants...',
-		},
+			{
+				paperId: 'suggested-1',
+				title: 'Advancements in Single–Cell CRISPR Screens for Genetic Discovery',
+				source: 'Nature Biotechnology',
+				meta: 'Oct 2024',
+				excerpt:
+					'This study explores the integration of single-cell sequencing with large-scale CRISPR interference to map regulatory landscapes of human fibroblasts...',
+			},
+			{
+				paperId: 'suggested-2',
+				title: 'Large Language Models as Predictive Engines for Molecular Dynamics',
+				source: 'ArXiv',
+				meta: 'Nov 2024',
+				excerpt:
+					'We present a novel architecture that leverages the attention mechanisms of transformers to predict protein folding paths with high temporal resolution...',
+			},
+			{
+				paperId: 'suggested-3',
+				title: 'The Impact of Algorithmic Bias on Genomic Metadata Classification',
+				source: 'Cell Systems',
+				meta: 'Sept 2024',
+				excerpt:
+					'Meta-analysis of cross-institutional datasets reveals systematic biases in automated labeling protocols for rare genetic variants...',
+			},
 	];
 
 	const topicsList = [
@@ -79,9 +84,6 @@ export default function Dashboard() {
 					<div className="welcome-section">
 						<h1 className="welcome-title">Welcome back, Ben.</h1>
 						<p className="welcome-subtitle">Reviewing the latest trends in Neural Architecture Search and CRISPR editing.</p>
-					</div>
-					<div className="search-wrap">
-						<input className="search-input" placeholder="Search publications..." />
 					</div>
 				</header>
 
@@ -146,7 +148,7 @@ export default function Dashboard() {
 
 							<div className="papers-list">
 								{suggested.map((p, i) => (
-									<PaperCard key={i} title={p.title} source={p.source} meta={p.meta} excerpt={p.excerpt} />
+									<PaperCard key={i} paperId={p.paperId} title={p.title} source={p.source} meta={p.meta} excerpt={p.excerpt} />
 								))}
 							</div>
 

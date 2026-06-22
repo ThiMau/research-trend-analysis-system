@@ -116,12 +116,13 @@ body {
 }
 
 .forgot a {
-    color: #00ddff;
+    color: #0f2b62;
     text-decoration: none;
 
 }
 
 .forgot a:hover {
+    color: #00ddff;
     text-decoration: underline;
 }
 
@@ -152,10 +153,11 @@ body {
 }
 
 .signup a {
-    color: #00ddff;
+    color: #0f2b62;
     text-decoration: none;
 }
 
 .signup a:hover {
+    color: #00ddff;
     text-decoration: underline;
 }

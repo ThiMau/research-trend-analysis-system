@@ -3,9 +3,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SearchBar.css";
 
-export default function SearchBar() {
+export default function SearchBar({ showInput = true }) {
   const [darkMode, setDarkMode] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [query, setQuery] = useState("");
 
   const navigate = useNavigate();
 
@@ -14,16 +15,32 @@ export default function SearchBar() {
     document.body.classList.toggle("dark-mode");
   };
 
+  const performSearch = () => {
+    const trimmed = query.trim();
+    navigate(trimmed ? `/search?keyword=${encodeURIComponent(trimmed)}` : "/search");
+  };
+
   return (
     <div className="searchbar-container">
 
-      <div className="search-input">
-        <Search size={18} />
-        <input
-          type="text"
-          placeholder="Search publications, authors, or research topics..."
-        />
-      </div>
+      {showInput && (
+        <div className="search-input">
+          <button type="button" className="search-icon" onClick={performSearch}>
+            <Search size={18} />
+          </button>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                performSearch();
+              }
+            }}
+            placeholder="Search publications, authors, or research topics..."
+          />
+        </div>
+      )}
 
       <div className="searchbar-actions">
 

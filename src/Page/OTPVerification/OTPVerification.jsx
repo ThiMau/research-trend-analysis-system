@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import authService from "../../Services/authService";
 import "./OTPVerification.css";
 
 function OTPVerification() {
   const navigate = useNavigate();
 
-  const email = sessionStorage.getItem("resetEmail");
+  const email = sessionStorage.getItem("email") || sessionStorage.getItem("resetEmail");
+  const otpFlow = sessionStorage.getItem("otpFlow") || "forgot-password";
 
   const [otp, setOtp] = useState([
     "",
@@ -19,16 +20,36 @@ function OTPVerification() {
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [timer, setTimer] = useState(57);
+  const [timer, setTimer] = useState(300); // 5 minutes
+  const [verified, setVerified] = useState(false);
 
   const inputRefs = useRef([]);
 
-  // If email is not present, redirect back to Forgot Password
+  const timerMinutes = Math.floor(timer / 60);
+  const timerSeconds = timer % 60;
+
+  const handlePaste = (e, index) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData("text").replace(/\D/g, "");
+    if (!paste) return;
+
+    const chars = paste.slice(0, 6 - index).split("");
+    const newOTP = [...otp];
+    chars.forEach((ch, i) => {
+      newOTP[index + i] = ch;
+    });
+
+    setOtp(newOTP);
+    const focusIndex = Math.min(5, index + chars.length - 1);
+    inputRefs.current[focusIndex]?.focus();
+  };
+
+  // If email is not present, redirect back
   useEffect(() => {
     if (!email) {
-      navigate("/forget-password");
+      navigate(otpFlow === "registration" ? "/register" : "/forget-password");
     }
-  }, [email, navigate]);
+  }, [email, navigate, otpFlow]);
 
   // Countdown resend OTP
   useEffect(() => {
@@ -41,17 +62,33 @@ function OTPVerification() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleChange = (value, index) => {
-    if (!/^[0-9]*$/.test(value)) return;
+  const handleChange = (e, index) => {
+    const raw = (e.target.value || "").replace(/\D/g, "");
+    if (!raw) {
+      const newOTP = [...otp];
+      newOTP[index] = "";
+      setOtp(newOTP);
+      return;
+    }
 
+    // If multiple digits entered (fast typing or mobile), spread them
+    const chars = raw.split("");
     const newOTP = [...otp];
-    newOTP[index] = value;
+
+    for (let i = 0; i < chars.length && index + i < 6; i++) {
+      newOTP[index + i] = chars[i];
+    }
 
     setOtp(newOTP);
 
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    // move focus to the next empty or last filled
+    const lastFilled = Math.min(5, index + chars.length - 1);
+    const nextIndex = Math.min(5, lastFilled + 1);
+    // delay to ensure DOM updates
+    setTimeout(() => {
+      inputRefs.current[nextIndex]?.focus();
+      inputRefs.current[nextIndex]?.select?.();
+    }, 0);
   };
 
   const handleKeyDown = (e, index) => {
@@ -84,16 +121,32 @@ function OTPVerification() {
           otp: otpCode,
         });
 
-// If backend returns a reset password token
-      const token =
-        response?.result?.token;
+      const data = response?.data || response;
 
-      if (token) {
-        navigate(
-          `/reset-password?token=${token}`
-        );
+      // Check if verification is successful
+      if (data?.code && data.code !== 1000) {
+        setMessage(data.message || "Invalid OTP");
+        return;
+      }
+
+      setMessage("Email verified successfully!");
+      setVerified(true);
+
+      // Handle different flows
+      if (otpFlow === "registration") {
+        // For registration: show success and let user click Back to Login manually
+        // Keep sessionStorage until user navigates so they can retry if needed
       } else {
-        navigate("/reset-password");
+        // For forgot password: navigate to reset password
+        const token = data?.result?.token;
+        
+        if (token) {
+          navigate(
+            `/reset-password?token=${token}`
+          );
+        } else {
+          navigate("/reset-password");
+        }
       }
     } catch (error) {
       setMessage(
@@ -111,18 +164,20 @@ function OTPVerification() {
     try {
       setLoading(true);
 
+      // Both registration and forgot-password use the same endpoint to resend OTP
       await authService.forgotPassword({
         email,
       });
 
-      setTimer(57);
+      setTimer(300);
 
       setMessage(
         "OTP has been resent"
       );
     } catch (error) {
       setMessage(
-        "Cannot resend OTP"
+        error.response?.data?.message ||
+          "Cannot resend OTP"
       );
     } finally {
       setLoading(false);
@@ -146,82 +201,102 @@ function OTPVerification() {
       <div className="otp-card">
         <h1>Verify Email</h1>
 
-        <p className="otp-description">
-          We've sent a 6-digit code
-          to your email. Please
-          enter it below to verify
-          your account.
-        </p>
+        {verified ? (
+          <>
+            <p className="otp-description" style={{ color: "#22c55e", marginBottom: "30px" }}>
+              ✓ {otpFlow === "registration" 
+                ? "Account created successfully! You will be redirected to login..."
+                : "Email verified! You will be redirected to reset password..."}
+            </p>
+            {otpFlow === "registration" && (
+              <Link
+                className="back-login"
+                to="/"
+                onClick={() => {
+                  sessionStorage.removeItem("email");
+                  sessionStorage.removeItem("otpFlow");
+                }}
+                style={{ marginTop: "20px", display: "inline-block" }}
+              >
+                ← Back to Login
+              </Link>
+            )}
+          </>
+        ) : (
+          <>
+            <p className="otp-description">
+              We've sent a 6-digit code
+              to your email. Please
+              enter it below to verify
+              your account.
+            </p>
 
-        <div className="otp-input-container">
-          {otp.map(
-            (item, index) => (
-              <input
-                key={index}
-                ref={(el) =>
-                  (inputRefs.current[
-                    index
-                  ] = el)
-                }
-                type="text"
-                maxLength="1"
-                value={item}
-                onChange={(e) =>
-                  handleChange(
-                    e.target.value,
-                    index
-                  )
-                }
-                onKeyDown={(e) =>
-                  handleKeyDown(
-                    e,
-                    index
-                  )
-                }
-              />
-            )
-          )}
-        </div>
+            <div className="otp-input-container">
+              {otp.map(
+                (item, index) => (
+                  <input
+                    key={index}
+                    ref={(el) =>
+                      (inputRefs.current[
+                        index
+                      ] = el)
+                    }
+                    type="text"
+                    maxLength="1"
+                    value={item}
+                    onChange={(e) => handleChange(e, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    onFocus={() => inputRefs.current[index]?.select()}
+                    onPaste={(e) => handlePaste(e, index)}
+                  />
+                )
+              )}
+            </div>
 
-        <button
-          className="verify-btn"
-          onClick={handleVerify}
-          disabled={loading}
-        >
-          {loading
-            ? "VERIFYING..."
-            : "VERIFY"}
-        </button>
+            <button
+              className="verify-btn"
+              onClick={handleVerify}
+              disabled={loading}
+            >
+              {loading
+                ? "VERIFYING..."
+                : "VERIFY"}
+            </button>
 
-        <div className="divider"></div>
+            <div className="divider"></div>
 
-        <p className="resend-text">
-          Didn't receive a code?
-        </p>
+            <p className="resend-text">
+              Didn't receive a code?
+            </p>
 
-        <button
-          className="resend-btn"
-          onClick={resendOTP}
-          disabled={timer > 0}
-        >
-          {timer > 0
-            ? `Resend code in 0:${String(
-                timer
-              ).padStart(2, "0")}`
-            : "Resend code"}
-        </button>
+            <button
+              className="resend-btn"
+              onClick={resendOTP}
+              disabled={timer > 0}
+            >
+              {timer > 0
+                ? `Resend code in ${timerMinutes}:${String(
+                    timerSeconds
+                  ).padStart(2, "0")}`
+                : "Resend code"}
+            </button>
 
-        <p
-          className="back-login"
-          onClick={() =>
-            navigate("/")
-          }
-        >
-          ← Back to Login
-        </p>
+            <Link
+              className="back-login"
+              to={otpFlow === "registration" ? "/register" : "/"}
+              onClick={() => {
+                if (otpFlow === "registration") return;
+                // if navigating to login, clear any temporary resetEmail
+                sessionStorage.removeItem("resetEmail");
+              }}
+            >
+              ← Back {otpFlow === "registration" ? "to Register" : "to Login"}
+            </Link>
+          </>
+        )}
 
         {message && (
-          <p className="message">
+          <p className={`message ${verified ? "success" : ""}`}>
             {message}
           </p>
         )}

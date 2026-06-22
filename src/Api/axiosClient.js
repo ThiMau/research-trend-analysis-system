@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "", // Sử dụng proxy từ vite.config.js
   headers: {
-    "Content-Type":
-      "application/json",
+    "Content-Type": "application/json",
   },
 });
 
