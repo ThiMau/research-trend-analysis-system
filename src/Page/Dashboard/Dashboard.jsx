@@ -156,19 +156,20 @@ export default function Dashboard() {
 								<div className="sort">Sort by Relevance</div>
 							</div>
 
-							<div className="papers-list">
-					{loading && <div>Loading suggested papers...</div>}
-					{error && <div className="error-message">{error}</div>}
-					{!loading && !error && suggested.length === 0 && (
-						<div>No suggested papers available.</div>
-					)}
-					{!loading && suggested.map((paper) => (
-						<PaperCard key={paper.paperId || paper.id} paper={paper} />
-							</div>
+                            <div className="papers-list">
+                                {loading && <div>Loading suggested papers...</div>}
+                                {error && <div className="error-message">{error}</div>}
+                                {!loading && !error && suggested.length === 0 && (
+                                    <div>No suggested papers available.</div>
+                                )}
+                                {!loading && suggested.map((paper) => (
+                                    <PaperCard key={paper.paperId || paper.id} paper={paper} />
+                                ))}
+                            </div>
+                        </div>
 
-							<div className="view-more">View More Suggestions</div>
-						</div>
-					</section>
+                        <div className="view-more">View More Suggestions</div>
+                    </section>
 				</section>
 			</main>
 		</div>
