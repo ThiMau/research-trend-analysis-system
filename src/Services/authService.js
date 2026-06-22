@@ -100,11 +100,12 @@ const authService = {
     return response.data;
   },
 
-  changePassword: async (data) => {
+  changePassword: async (data, config = {}) => {
     const response =
       await axiosClient.put(
         "/users/change-password",
-        data
+        data,
+        config
       );
 
     return response.data;

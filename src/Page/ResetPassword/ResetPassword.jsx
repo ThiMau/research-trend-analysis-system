@@ -276,7 +276,7 @@ function ResetPassword() {
 
                 >
 
-                    Back to Authentication Portal
+                    Back to Login
 
                 </span>
 

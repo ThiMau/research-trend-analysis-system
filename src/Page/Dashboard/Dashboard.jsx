@@ -1,5 +1,7 @@
 import './Dashboard.css';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../../Services/authService';
 
 const stats = [
 	{ label: 'Saved Publications', value: 128 },
@@ -16,17 +18,22 @@ function StatCard({ label, value }) {
 	);
 }
 
-function PaperCard({ paperId, title, source, meta, excerpt }) {
+function PaperCard({ paper }) {
 	const navigate = useNavigate();
+	const paperId = paper?.paperId || paper?.id;
 
 	return (
-		<article className="paper-card" onClick={() => navigate(`/papers/${encodeURIComponent(paperId || title)}`)} style={{ cursor: 'pointer' }}>
+		<article
+			className="paper-card"
+			onClick={() => paperId && navigate(`/papers/${encodeURIComponent(paperId)}`)}
+			style={{ cursor: paperId ? 'pointer' : 'default' }}
+		>
 			<div className="paper-header">
-				<div className="paper-badge">{source}</div>
-				<div className="paper-date">{meta}</div>
+				<div className="paper-badge">{paper?.journalName || paper?.source || 'Source'}</div>
+				<div className="paper-date">{paper?.publicationYear || paper?.publishedDate || 'N/A'}</div>
 			</div>
-			<h4 className="paper-title">{title}</h4>
-			<p className="paper-excerpt">{excerpt}</p>
+			<h4 className="paper-title">{paper?.title || paper?.name || 'Untitled'}</h4>
+			<p className="paper-excerpt">{paper?.paperAbstract || paper?.abstract || paper?.excerpt || 'No summary available.'}</p>
 			<div className="paper-actions">
 				<button className="icon-btn">☆</button>
 				<button className="icon-btn">⤴</button>
@@ -36,32 +43,35 @@ function PaperCard({ paperId, title, source, meta, excerpt }) {
 }
 
 export default function Dashboard() {
-	const suggested = [
-			{
-				paperId: 'suggested-1',
-				title: 'Advancements in Single–Cell CRISPR Screens for Genetic Discovery',
-				source: 'Nature Biotechnology',
-				meta: 'Oct 2024',
-				excerpt:
-					'This study explores the integration of single-cell sequencing with large-scale CRISPR interference to map regulatory landscapes of human fibroblasts...',
-			},
-			{
-				paperId: 'suggested-2',
-				title: 'Large Language Models as Predictive Engines for Molecular Dynamics',
-				source: 'ArXiv',
-				meta: 'Nov 2024',
-				excerpt:
-					'We present a novel architecture that leverages the attention mechanisms of transformers to predict protein folding paths with high temporal resolution...',
-			},
-			{
-				paperId: 'suggested-3',
-				title: 'The Impact of Algorithmic Bias on Genomic Metadata Classification',
-				source: 'Cell Systems',
-				meta: 'Sept 2024',
-				excerpt:
-					'Meta-analysis of cross-institutional datasets reveals systematic biases in automated labeling protocols for rare genetic variants...',
-			},
-	];
+	const [suggested, setSuggested] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
+
+	useEffect(() => {
+		const loadSuggested = async () => {
+			setLoading(true);
+			setError("");
+
+			try {
+				const res = await authService.getPapers({
+					page: 0,
+					size: 6,
+					sortBy: 'createdAt',
+					direction: 'desc',
+				});
+
+				const list = res?.result?.content || res?.content || res?.result || [];
+				setSuggested(list.slice(0, 3));
+			} catch (err) {
+				console.error(err);
+				setError('Unable to load suggested papers. Please refresh.');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadSuggested();
+	}, []);
 
 	const topicsList = [
 		{ name: 'Machine Learning' },
@@ -147,9 +157,13 @@ export default function Dashboard() {
 							</div>
 
 							<div className="papers-list">
-								{suggested.map((p, i) => (
-									<PaperCard key={i} paperId={p.paperId} title={p.title} source={p.source} meta={p.meta} excerpt={p.excerpt} />
-								))}
+					{loading && <div>Loading suggested papers...</div>}
+					{error && <div className="error-message">{error}</div>}
+					{!loading && !error && suggested.length === 0 && (
+						<div>No suggested papers available.</div>
+					)}
+					{!loading && suggested.map((paper) => (
+						<PaperCard key={paper.paperId || paper.id} paper={paper} />
 							</div>
 
 							<div className="view-more">View More Suggestions</div>

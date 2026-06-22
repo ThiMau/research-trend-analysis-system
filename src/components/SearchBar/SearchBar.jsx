@@ -75,9 +75,9 @@ export default function SearchBar({ showInput = true }) {
                 )}
               </button>
 
-              <button onClick={() => navigate("/reset-password")}>
+              <button onClick={() => navigate("/change-password")}>
                 <Key size={16} />
-                Reset Password
+                Change Password
               </button>
 
             </div>
