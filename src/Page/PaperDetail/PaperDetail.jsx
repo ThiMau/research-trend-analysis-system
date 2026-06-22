@@ -11,6 +11,10 @@ const PaperDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = location.state?.returnTo || '/search';
+
   useEffect(() => {
     fetchPaper();
   }, [paperId]);
@@ -61,10 +65,6 @@ const PaperDetail = () => {
   if (!paper) {
     return <div>No Data</div>;
   }
-
-  const navigate = useNavigate();
-  const location = useLocation();
-  const returnTo = location.state?.returnTo || '/search';
 
   return (
     <div className="paper-detail-page">
