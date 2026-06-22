@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
 import authService from "../../Services/authService";
 
@@ -7,20 +7,21 @@ import authService from "../../Services/authService";
 function ResetPassword() {
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [password, setPassword] = useState("");
-
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [message, setMessage] = useState("");
-
     const [loading, setLoading] = useState(false);
 
+    const otp = sessionStorage.getItem("resetOtp");
 
-    const token = new URLSearchParams(
-        location.search
-    ).get("token");
+    useEffect(() => {
+      if (!otp) {
+        navigate("/forget-password");
+      }
+    }, [otp, navigate]);
 
 
 
@@ -42,78 +43,59 @@ function ResetPassword() {
 
         e.preventDefault();
 
-
         if(
             !passwordRules.length ||
             !passwordRules.special ||
             !passwordRules.number ||
             !passwordRules.uppercase
         ){
-
             setMessage(
                 "Password does not meet requirements"
             );
-
             return;
         }
 
+        if (password !== confirmPassword) {
+            setMessage("Passwords do not match.");
+            return;
+        }
 
-
-        if(!token){
-
+        if(!otp){
             setMessage(
-                "Invalid reset token"
+                "Invalid or missing OTP. Please request a new code."
             );
-
             return;
-
         }
-
-
 
         try{
-
             setLoading(true);
 
-
             await authService.resetPassword({
-
-                token: token,
-
-                newPassword: password
-
+                otp,
+                newPassword: password,
+                confirmPassword: confirmPassword,
             });
 
-
+            sessionStorage.removeItem("resetOtp");
+            sessionStorage.removeItem("resetEmail");
+            sessionStorage.removeItem("otpFlow");
 
             setMessage(
                 "Password updated successfully"
             );
 
-
             setTimeout(()=>{
-
                 navigate("/login");
-
             },1500);
 
-
-
         }catch(error){
-
             setMessage(
-
                 error.response?.data?.message ||
                 "Reset password failed"
-
             );
-
         }finally{
-
             setLoading(false);
-
         }
-
     };
 
 

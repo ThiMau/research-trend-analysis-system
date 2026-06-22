@@ -115,39 +115,27 @@ function OTPVerification() {
       setLoading(true);
       setMessage("");
 
-      const response =
-        await authService.verifyEmail({
-          email,
-          otp: otpCode,
-        });
+      if (otpFlow === "registration") {
+        const response =
+          await authService.verifyEmail({
+            email,
+            otp: otpCode,
+          });
 
-      const data = response?.data || response;
+        const data = response?.data || response;
 
-      // Check if verification is successful
-      if (data?.code && data.code !== 1000) {
-        setMessage(data.message || "Invalid OTP");
+        if (data?.code && data.code !== 1000) {
+          setMessage(data.message || "Invalid OTP");
+          return;
+        }
+
+        setMessage("Email verified successfully!");
+        setVerified(true);
         return;
       }
 
-      setMessage("Email verified successfully!");
-      setVerified(true);
-
-      // Handle different flows
-      if (otpFlow === "registration") {
-        // For registration: show success and let user click Back to Login manually
-        // Keep sessionStorage until user navigates so they can retry if needed
-      } else {
-        // For forgot password: navigate to reset password
-        const token = data?.result?.token;
-        
-        if (token) {
-          navigate(
-            `/reset-password?token=${token}`
-          );
-        } else {
-          navigate("/reset-password");
-        }
-      }
+      sessionStorage.setItem("resetOtp", otpCode);
+      navigate("/reset-password");
     } catch (error) {
       setMessage(
         error.response?.data?.message ||

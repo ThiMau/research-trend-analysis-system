@@ -23,11 +23,10 @@ function ForgetPassword() {
         try {
             setLoading(true);
             setMessage("");
-            await authService.forgotPassword({ email });
-
-            setMessage(
-                "Reset link sent. Please check your email and follow the link to update your password."
-            );
+            await authService.forgotPassword({ email: email.trim() });
+            sessionStorage.setItem("resetEmail", email.trim());
+            sessionStorage.setItem("otpFlow", "forgot-password");
+            navigate("/verify-email");
         } catch (error) {
 
             setMessage(
