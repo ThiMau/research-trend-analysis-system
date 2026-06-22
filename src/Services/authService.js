@@ -212,7 +212,19 @@ getAuthorDetail: async (
             ?.content || [],
       };
     },
+
+  // ======================
+  // REPORTS
+  // ======================
+
+  createReport: async (data) => {
+    const response = await axiosClient.post(
+      "/api/member/reports",
+      data
+    );
+
+    return response.data;
+  },
 };
 
 export default authService;
-

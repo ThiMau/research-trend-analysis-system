@@ -81,7 +81,15 @@ const PaperDetail = () => {
 
         <div className="action-buttons">
           <button>Save to Folder</button>
-          <button>Report Paper</button>
+          <button
+            onClick={() =>
+              navigate("/report", {
+                state: { paper },
+              })
+            }
+          >
+            Report Paper
+          </button>
           <button className="primary">View Full Paper</button>
         </div>
 

@@ -1,174 +1,89 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import authService from "../../Services/authService";
 import "./Report.css";
 
-const Report = () => {
-  const location = useLocation();
+export default function ReportPage() {
+  const { state } = useLocation();
+  const navigate = useNavigate();
 
-  const [paper, setPaper] = useState(null);
-
-  const [reportType, setReportType] =
-    useState("");
-
-  const [description, setDescription] =
-    useState("");
+  const [paper, setPaper] = useState(state?.paper || null);
+  const [reportType, setReportType] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (location.state?.paper) {
-      setPaper(location.state.paper);
+    if (!paper) {
+      // If no paper provided, redirect back
+      // after a short delay to give user feedback
+      const t = setTimeout(() => navigate(-1), 800);
+      return () => clearTimeout(t);
     }
-  }, [location]);
+  }, [paper]);
 
-  const handleSubmit = async () => {
+  const submitReport = async () => {
+    if (!paper?.paperId) {
+      setError("Invalid paper selected.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
     try {
-      console.log({
-        paperId: paper?.paperId,
+      await authService.createReport({
+        paperId: paper.paperId,
         reportType,
         description,
       });
 
-      alert("Report submitted!");
-    } catch (error) {
-      console.error(error);
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to submit report. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const reportHistory = [
-    {
-      title: "AI Ethics in Clinical Trials",
-      type: "Metadata Mismatch",
-      status: "Resolved",
-      date: "Sep 28, 2024",
-    },
-    {
-      title: "Graph Neural Networks 101",
-      type: "Broken Hyperlinks",
-      status: "Pending",
-      date: "Sep 30, 2024",
-    },
-    {
-      title: "Protein Folding Trends",
-      type: "Author Ambiguity",
-      status: "Resolved",
-      date: "Oct 05, 2024",
-    },
-  ];
+  if (!paper) {
+    return (
+      <div className="report-page">
+        <h2>No paper selected</h2>
+        <p>Redirecting...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="report-page">
-      <h1>Report Management</h1>
+      <h2>Report Paper</h2>
 
-      <p>
-        Review and manage data integrity
-        reports for academic publications.
-      </p>
+      <div className="paper-summary">
+        <h3>{paper.title}</h3>
+        <p>{paper.journalName} • {paper.publicationYear}</p>
+      </div>
 
-      {paper && (
-        <div className="report-form-card">
-          <div className="report-header">
-            REPORT ISSUES
-          </div>
+      <div className="report-form">
+        <label>Report Type</label>
+        <select value={reportType} onChange={(e) => setReportType(e.target.value)}>
+          <option value="">Select type</option>
+          <option value="plagiarism">Plagiarism</option>
+          <option value="inappropriate">Inappropriate content</option>
+          <option value="other">Other</option>
+        </select>
 
-          <div className="report-body">
-            <label>Paper Title</label>
+        <label>Description</label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
 
-            <h3>{paper.title}</h3>
+        {error && <div className="error">{error}</div>}
 
-            <label>Report Type</label>
-
-            <select
-              value={reportType}
-              onChange={(e) =>
-                setReportType(
-                  e.target.value
-                )
-              }
-            >
-              <option value="">
-                Select report type...
-              </option>
-
-              <option>
-                Metadata Mismatch
-              </option>
-
-              <option>
-                Broken Hyperlinks
-              </option>
-
-              <option>
-                Author Ambiguity
-              </option>
-
-              <option>
-                Duplicate Paper
-              </option>
-
-              <option>
-                Other
-              </option>
-            </select>
-
-            <textarea
-              placeholder="Enter report details here..."
-              value={description}
-              onChange={(e) =>
-                setDescription(
-                  e.target.value
-                )
-              }
-            />
-
-            <button
-              className="report-btn"
-              onClick={handleSubmit}
-            >
-              Report
-            </button>
-          </div>
+        <div className="actions">
+          <button onClick={() => navigate(-1)} disabled={loading}>Cancel</button>
+          <button onClick={submitReport} disabled={loading || !reportType}>Submit Report</button>
         </div>
-      )}
-
-      <div className="history-section">
-        <div className="history-header">
-          <h2>Report History</h2>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Paper Title</th>
-              <th>Report Type</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {reportHistory.map(
-              (item, index) => (
-                <tr key={index}>
-                  <td>{item.title}</td>
-
-                  <td>{item.type}</td>
-
-                  <td>
-                    <span
-                      className={`status ${item.status.toLowerCase()}`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-
-                  <td>{item.date}</td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
       </div>
     </div>
   );
-};
-
-export default Report;
+}

@@ -9,6 +9,7 @@ import Dashboard from "../Page/Dashboard/Dashboard";
 import Search from "../Page/Search/Search";
 import TrendAnalytic from "../Page/TrendAnalytic/TrendAnalytic";
 import MyLibrary from "../Page/MyLibrary/MyLibrary";
+import Report from "../Page/Report/Report";
 
 import PaperDetail from "../Page/PaperDetail/PaperDetail";
 import AuthorDetail from "../Page/AuthorDetail/AuthorDetail";
@@ -167,6 +168,17 @@ function AppRoutes() {
             <ProtectedRoute>
               <MainLayout>
                 <ChangePassword />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Report />
               </MainLayout>
             </ProtectedRoute>
           }

@@ -72,7 +72,10 @@ export default function Sidebar() {
           <span>My Library</span>
         </div>
 
-        <div className="menu-item">
+        <div
+          className={`menu-item ${isActive("/report") ? "active" : ""}`}
+          onClick={() => navigate("/report")}
+        >
           <FileText size={18} />
           <span>Report</span>
         </div>
