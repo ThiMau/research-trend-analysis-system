@@ -181,6 +181,25 @@ function ResetPassword() {
 
 
 
+                    <label>
+                        CONFIRM PASSWORD
+                    </label>
+
+                    <div className="password-wrapper">
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm new password"
+                        />
+                        <span
+                            className="eye"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            👁
+                        </span>
+                    </div>
+
                     <div className="rules">
 
 
