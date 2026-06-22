@@ -1,63 +1,75 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import "./Search.css";
 import {
   Search,
-  Bookmark,
   ChevronDown,
-  BookOpen,
 } from "lucide-react";
+import axiosClient from "../../Api/axiosClient";
+import PublicationCard from "../../components/PublicationCard/PublicationCard";
 
 export default function SearchPage() {
-  const [saved, setSaved] = useState([false, false, true]);
+  const [searchParams] = useSearchParams();
+  const initialKeyword = searchParams.get("keyword") || "";
 
-  const papers = [
-    {
-      date: "Nov 12, 2023",
-      title:
-        "Neural Network Architectures for Efficient Resource Allocation in Large-Scale Edge Computing",
-      authors:
-        "Dr. Elena Rodriguez, Mark J. Sutherland, Prof. David Chen",
-      journal: "Journal of Advanced AI",
-    },
-    {
-      date: "Feb 08, 2024",
-      title:
-        "Climate Impact Assessment of Multi-Layer Permafrost Degradation in the Arctic Basin",
-      authors: "Sarah L. White, Henrik Von Nordheim",
-      journal: "Nature Geoscience",
-    },
-    {
-      date: "May 21, 2022",
-      title:
-        "Statistical Modeling of Socio-Economic Disparities in Global Health Education",
-      authors: "Dr. Amit Shah, Lisa K. Thompson",
-      journal: "The Lancet Public Health",
-    },
-  ];
+  const [keyword, setKeyword] = useState(initialKeyword);
+  const [papers, setPapers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const handleSearch = useCallback(async (page = 0, size = 10, searchTermParam) => {
+    const searchTerm = searchTermParam !== undefined ? searchTermParam : keyword;
+    setLoading(true);
+    setError("");
 
-  const handleSave = (index) => {
-    const clone = [...saved];
-    clone[index] = !clone[index];
-    setSaved(clone);
-  };
+    try {
+      const res = await axiosClient.get("/api/member/papers", {
+        params: {
+          keyword: searchTerm,
+          page,
+          size,
+          sortBy: "createdAt",
+          direction: "desc",
+        },
+      });
+
+      const result = res.data?.result;
+      const list = result?.content || [];
+      setPapers(list);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load search results. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, [keyword]);
+
+  useEffect(() => {
+    if (initialKeyword) {
+      (async () => {
+        await handleSearch(0, 10, initialKeyword);
+      })();
+    }
+  }, [initialKeyword, handleSearch]);
 
   return (
     <div className="search-page">
-
       <div className="search-top">
-
         <div className="search-box">
           <Search size={18} />
           <input
             type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
             placeholder="Search publications by title, DOI, or keywords..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
           />
         </div>
 
-        <button className="search-btn">
+        <button className="search-btn" onClick={() => handleSearch()}>
           Search
         </button>
-
       </div>
 
       <div className="quick-tags">
@@ -69,63 +81,35 @@ export default function SearchPage() {
       </div>
 
       <div className="result-header">
-
-        <h4>SHOWING 428 RESULTS</h4>
+        <h4>
+          SHOWING {papers.length} RESULT{papers.length !== 1 ? "S" : ""}
+        </h4>
 
         <div className="sort-box">
           Sort by: <strong>Relevance</strong>
           <ChevronDown size={14} />
         </div>
-
       </div>
 
       <div className="paper-list">
+        {loading && <div>Loading results...</div>}
+        {error && <div className="error" style={{ color: "red" }}>{error}</div>}
 
-        {papers.map((paper, index) => (
-          <div className="paper-card" key={index}>
+        {!loading && papers.length === 0 && <div>No results. Try a different keyword.</div>}
 
-            <div className="paper-content">
-
-              <span className="paper-date">
-                {paper.date}
-              </span>
-
-              <h2>{paper.title}</h2>
-
-              <p className="paper-authors">
-                {paper.authors}
-              </p>
-
-              <div className="paper-journal">
-                <BookOpen size={14} />
-                {paper.journal}
-              </div>
-
-            </div>
-
-            <button
-              className={`save-btn ${
-                saved[index] ? "saved" : ""
-              }`}
-              onClick={() => handleSave(index)}
-            >
-              <Bookmark size={18} />
-              <span>
-                {saved[index] ? "SAVED" : "SAVE"}
-              </span>
-            </button>
-
-          </div>
-        ))}
+        {!loading &&
+          papers.map((paper, index) => {
+            const returnTo = `/search?keyword=${encodeURIComponent(keyword || '')}`;
+            return <PublicationCard key={paper.paperId || index} paper={paper} returnTo={returnTo} />;
+          })}
       </div>
 
       <div className="load-more">
-        <button>
-          Load More Results
+        <button onClick={() => handleSearch()}>
+          Load / Refresh Results
           <ChevronDown size={16} />
         </button>
       </div>
-
     </div>
   );
 }

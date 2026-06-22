@@ -9,17 +9,20 @@ import {
   Headset,
   LogOut,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../Services/authService";
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const handleLogout = () => {
     authService.logout();
-    // Navigate to login and replace history entry so Back won't return to protected pages
     window.location.replace("/login");
   };
+
+  const isActive = (path) => currentPath === path;
 
   return (
     <div className="sidebar">
@@ -37,22 +40,34 @@ export default function Sidebar() {
 
       <div className="menu">
 
-        <div className="menu-item">
+        <div
+          className={`menu-item ${isActive("/dashboard") ? "active" : ""}`}
+          onClick={() => navigate("/dashboard")}
+        >
           <LayoutDashboard size={18} />
           <span>Dashboard</span>
         </div>
 
-        <div className="menu-item">
+        <div
+          className={`menu-item ${isActive("/search") ? "active" : ""}`}
+          onClick={() => navigate("/search")}
+        >
           <Search size={18} />
           <span>Search</span>
         </div>
 
-        <div className="menu-item active">
+        <div
+          className={`menu-item ${isActive("/trend-analytic") ? "active" : ""}`}
+          onClick={() => navigate("/trend-analytic")}
+        >
           <TrendingUp size={18} />
           <span>Trend Analytics</span>
         </div>
 
-        <div className="menu-item">
+        <div
+          className={`menu-item ${isActive("/my-library") ? "active" : ""}`}
+          onClick={() => navigate("/my-library")}
+        >
           <Library size={18} />
           <span>My Library</span>
         </div>
