@@ -27,13 +27,30 @@ export default function ChangePassword() {
 
     try {
       setLoading(true);
-      const response = await authService.changePassword({
-        oldPassword: currentPassword,
-        newPassword,
-      });
+      const token = localStorage.getItem("token");
+      const response = await authService.changePassword(
+        {
+          oldPassword: currentPassword,
+          newPassword,
+        },
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : undefined,
+          },
+        }
+      );
 
-      if (response?.code === 1000) {
+      const success =
+        response?.code === 1000 ||
+        response?.success === true ||
+        response?.status === "success";
+
+      if (success) {
         setMessage("Password changed successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+
         setTimeout(() => {
           navigate("/dashboard");
         }, 1200);
@@ -43,6 +60,7 @@ export default function ChangePassword() {
     } catch (error) {
       setMessage(
         error.response?.data?.message ||
+          error.message ||
           "Password change failed. Please try again."
       );
     } finally {

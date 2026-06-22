@@ -3,10 +3,11 @@ import "./PublicationCard.css";
 
 const PublicationCard = ({ paper, returnTo }) => {
   const navigate = useNavigate();
+  const paperId = paper?.paperId || paper?.id;
 
   const handleClick = () => {
-    if (!paper?.paperId) return;
-    navigate(`/papers/${paper.paperId}`, { state: { returnTo } });
+    if (!paperId) return;
+    navigate(`/papers/${encodeURIComponent(paperId)}`, { state: { returnTo } });
   };
 
   return (
