@@ -31,8 +31,8 @@ export default function ReportPage() {
 
   useEffect(() => {
     // if the page was opened with a paper in state, ensure local paper state is set
-    if (state?.paper && !paper) setPaper(state.paper);
-  }, [paper]);
+    if (state?.paper ) setPaper(state.paper);
+  }, [state]);
 
   const submitReport = async () => {
     // allow creating a report even if no paper (sidebar entry). Use local history when API unavailable.
@@ -60,12 +60,12 @@ export default function ReportPage() {
           // if API requires paperId and none present, skip API call
         }
       } catch (apiErr) {
-        console.warn('createReport API failed or unavailable', apiErr);
+        console.error('createReport API failed or unavailable', apiErr);
       }
 
       const updated = [newEntry, ...history];
       setHistory(updated);
-      try { localStorage.setItem('reportsHistory', JSON.stringify(updated)); } catch (e) {}
+      try { localStorage.setItem('reportsHistory', JSON.stringify(updated)); } catch (e) { }
 
       // clear form but stay on the page so user sees history
       setReportType("");
@@ -85,8 +85,12 @@ export default function ReportPage() {
       <h2>Report Paper</h2>
 
       <div className="paper-summary">
-        <h3>{paper.title}</h3>
-        <p>{paper.journalName} • {paper.publicationYear}</p>
+        <h3>{paper?.title || "No paper selected"}</h3>
+
+        <p>
+          {paper?.journalName || ""}
+          {paper?.publicationYear && ` • ${paper.publicationYear}`}
+        </p>
       </div>
 
       <div className="report-form-card">
@@ -137,7 +141,7 @@ export default function ReportPage() {
                   <tr key={idx}>
                     <td>{h.paperTitle}</td>
                     <td>{h.reportType}</td>
-                    <td><span className={`status ${h.status==='resolved'? 'resolved':'pending'}`}>{h.status}</span></td>
+                    <td><span className={`status ${h.status === 'resolved' ? 'resolved' : 'pending'}`}>{h.status}</span></td>
                     <td>{h.date}</td>
                   </tr>
                 ))}
