@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authService from "../../Services/authService";
+import userService from "../../Services/userService";
 import "./ChangePassword.css";
 
 export default function ChangePassword() {
@@ -28,7 +28,7 @@ export default function ChangePassword() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await authService.changePassword(
+      const response = await userService.changePassword(
         {
           oldPassword: currentPassword,
           newPassword,
