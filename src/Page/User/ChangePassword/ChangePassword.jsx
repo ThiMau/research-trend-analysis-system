@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import userService from "../../Services/userService";
+import userService from "../../../Services/userService";
 import "./ChangePassword.css";
 
 export default function ChangePassword() {

@@ -1,7 +1,7 @@
 import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../Services/authService';
+import authService from '../../../Services/authService';
 
 const stats = [
 	{ label: 'Saved Publications', value: 128 },

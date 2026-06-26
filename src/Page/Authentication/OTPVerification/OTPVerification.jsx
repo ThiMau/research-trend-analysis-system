@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import authService from "../../Services/authService";
+import authService from "../../../Services/authService";
 import "./OTPVerification.css";
 
 function OTPVerification() {

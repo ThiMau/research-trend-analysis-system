@@ -5,8 +5,8 @@ import {
   Search,
   ChevronDown,
 } from "lucide-react";
-import axiosClient from "../../Api/axiosClient";
-import PublicationCard from "../../components/PublicationCard/PublicationCard";
+import axiosClient from "../../../Api/axiosClient";
+import PublicationCard from "../../../components/PublicationCard/PublicationCard";
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();

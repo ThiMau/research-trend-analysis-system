@@ -1,21 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "../Page/Login/Login";
-import Register from "../Page/Register/Register";
-import ForgetPassword from "../Page/ForgetPassword/ForgetPassword";
-import OTPVerification from "../Page/OTPVerification/OTPVerification";
+import Login from "../Page/Authentication/Login/Login";
+import Register from "../Page/Authentication/Register/Register";
+import ForgetPassword from "../Page/Authentication/ForgetPassword/ForgetPassword";
+import OTPVerification from "../Page/Authentication/OTPVerification/OTPVerification";
 
-import Dashboard from "../Page/Dashboard/Dashboard";
-import Search from "../Page/Search/Search";
-import TrendAnalytic from "../Page/TrendAnalytic/TrendAnalytic";
-import MyLibrary from "../Page/MyLibrary/MyLibrary";
-import Report from "../Page/Report/Report";
+import Dashboard from "../Page/User/Dashboard/Dashboard";
+import Search from "../Page/User/Search/Search";
+import TrendAnalytic from "../Page/User/TrendAnalytic/TrendAnalytic";
+import MyLibrary from "../Page/User/MyLibrary/MyLibrary";
+import Report from "../Page/User/Report/Report";
 
-import PaperDetail from "../Page/PaperDetail/PaperDetail";
-import AuthorDetail from "../Page/AuthorDetail/AuthorDetail";
-import JournalDetail from "../Page/JournalDetail/JournalDetail";
-import ResetPassword from "../Page/ResetPassword/ResetPassword";
-import ChangePassword from "../Page/ChangePassword/ChangePassword";
+import PaperDetail from "../Page/Detail/PaperDetail/PaperDetail";
+import AuthorDetail from "../Page/Detail/AuthorDetail/AuthorDetail";
+import JournalDetail from "../Page/Detail/JournalDetail/JournalDetail";
+import ResetPassword from "../Page/Authentication/ResetPassword/ResetPassword";
+import ChangePassword from "../Page/User/ChangePassword/ChangePassword";
 import ProtectedRoute from "./ProtectedRoute";
 
 import Sidebar from "../components/Sidebar/Sidebar";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import authService from "../../Services/authService";
+import authService from "../../../Services/authService";
 import "./Report.css";
 
 export default function ReportPage() {

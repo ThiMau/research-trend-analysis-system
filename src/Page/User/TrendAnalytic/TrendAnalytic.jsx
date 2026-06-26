@@ -1,6 +1,6 @@
 import "./TrendAnalytic.css";
 import { useEffect, useState } from "react";
-import axiosClient from "../../Api/axiosClient";
+import axiosClient from "../../../Api/axiosClient";
 
 export default function TrendAnalytic() {
   const [papers, setPapers] = useState([]);

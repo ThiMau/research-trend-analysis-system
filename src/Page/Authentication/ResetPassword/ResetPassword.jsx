@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ResetPassword.css";
-import authService from "../../Services/authService";
+import authService from "../../../Services/authService";
 
 
 function ResetPassword() {

@@ -1,7 +1,7 @@
 import "./Login.css";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import authService from "../../Services/authService";
+import authService from "../../../Services/authService";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
