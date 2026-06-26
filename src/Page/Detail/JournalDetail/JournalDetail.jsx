@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import authService from "../../../Services/authService";
+import userService from "../../../Services/userService";
 import "./JournalDetail.css";
 
 const JournalDetail = () => {
@@ -21,7 +21,7 @@ const JournalDetail = () => {
     setLoading(true);
 
     try {
-      const res = await authService.getJournalWithPapers(journalId);
+      const res = await userService.getJournalWithPapers(journalId);
       const journalData = res?.journal || res?.result || res;
       const papersData = res?.papers || res?.result?.content || res?.papers || [];
 

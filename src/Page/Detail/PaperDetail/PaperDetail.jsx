@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
-import authService from "../../../Services/authService";
+import userService from "../../../Services/userService";
 import "./PaperDetail.css";
 
 const PaperDetail = () => {
@@ -27,7 +27,7 @@ const PaperDetail = () => {
 
   const fetchPaper = async () => {
     try {
-      const res = await authService.getPaperDetail(paperId);
+      const res = await userService.getPaperDetail(paperId);
       const data = res?.result || res;
       setPaper(data);
     } catch (err) {
@@ -40,7 +40,7 @@ const PaperDetail = () => {
 
   const fetchJournal = async (journalId) => {
     try {
-      const res = await authService.getJournalById(journalId);
+      const res = await userService.getJournalById(journalId);
       const data = res?.result || res;
       setJournalDetail(data);
     } catch (err) {

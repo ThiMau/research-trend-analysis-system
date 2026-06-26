@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import authService from "../../../Services/authService";
+import userService from "../../../Services/userService";
 import "./AuthorDetail.css";
 
 function AuthorDetail() {
@@ -21,7 +21,7 @@ function AuthorDetail() {
 
       // fetch author
       const authorRes =
-        await authService.getAuthorDetail(
+        await userService.getAuthorDetail(
           authorId
         );
 
@@ -32,7 +32,7 @@ function AuthorDetail() {
 
       // fetch papers
       const papersRes =
-        await authService.getPapers({
+        await userService.getPapers({
           size: 100,
         });
 
