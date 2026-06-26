@@ -1,7 +1,7 @@
 import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../../Services/authService';
+import userService from '../../../Services/userService';
 
 const stats = [
 	{ label: 'Saved Publications', value: 128 },
@@ -53,7 +53,7 @@ export default function Dashboard() {
 			setError("");
 
 			try {
-				const res = await authService.getPapers({
+				const res = await userService.getPapers({
 					page: 0,
 					size: 6,
 					sortBy: 'createdAt',

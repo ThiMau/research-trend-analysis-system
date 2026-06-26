@@ -15,7 +15,7 @@ import PaperDetail from "../Page/Detail/PaperDetail/PaperDetail";
 import AuthorDetail from "../Page/Detail/AuthorDetail/AuthorDetail";
 import JournalDetail from "../Page/Detail/JournalDetail/JournalDetail";
 import ResetPassword from "../Page/Authentication/ResetPassword/ResetPassword";
-import ChangePassword from "../Page/User/ChangePassword/ChangePassword";
+import Profile from "../Page/User/Profile/Profile";
 import ProtectedRoute from "./ProtectedRoute";
 
 import Sidebar from "../components/Sidebar/Sidebar";
@@ -163,11 +163,11 @@ function AppRoutes() {
         />
 
         <Route
-          path="/change-password"
+          path="/profile"
           element={
             <ProtectedRoute>
               <MainLayout>
-                <ChangePassword />
+                <Profile />
               </MainLayout>
             </ProtectedRoute>
           }
