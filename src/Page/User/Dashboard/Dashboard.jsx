@@ -1,8 +1,13 @@
 import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../../../Services/authService';
+import userService from '../../../Services/userService';
 
+const stats = [
+	{ label: 'Saved Publications', value: 128 },
+	{ label: 'Recent Views', value: 42 },
+	{ label: 'Followed Topics', value: 14 },
+];
 
 function StatCard({ label, value }) {
 	return (
@@ -42,83 +47,45 @@ export default function Dashboard() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 
-	const [totalPublications, setTotalPublications] = useState(0);
-	const [savedPublications, setSavedPublications] = useState(0);
+	useEffect(() => {
+		const loadSuggested = async () => {
+			setLoading(true);
+			setError("");
 
-	const [followedTopics, setFollowedTopics] = useState([]);
-	const [keywords, setKeywords] = useState([]);
-	const [authors, setAuthors] = useState([]);
-	const [paperPerYear, setPaperPerYear] = useState([]);
+			try {
+				const res = await userService.getPapers({
+					page: 0,
+					size: 6,
+					sortBy: 'createdAt',
+					direction: 'desc',
+				});
 
-	const stats = [
-	{ 
-		label: 'Total Publications',
-		value: totalPublications, 
-	},
-	{ 
-		label: 'Saved Publications', 
-		value: savedPublications, 
-	},
-	{ 
-		label: 'Followed Topics', 
-		value: followedTopics.length, 
-	},
-	{ 
-		label: 'Followed Authors', 
-		value: authors.length, 
-	},
+				const list = res?.result?.content || res?.content || res?.result || [];
+				setSuggested(list.slice(0, 3));
+			} catch (err) {
+				console.error(err);
+				setError('Unable to load suggested papers. Please refresh.');
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadSuggested();
+	}, []);
+
+	const topicsList = [
+		{ name: 'Machine Learning' },
+		{ name: 'Genetics' },
+		{ name: 'Biotech' },
+		{ name: 'Quantum Computing' },
+		{ name: 'AI Ethics' },
 	];
 
-	useEffect(() => {
-    const loadDashboard = async () => {
-        setLoading(true);
-        setError("");
-
-        try {
-            // 1. Suggested Papers
-            const paperRes = await authService.getPapers({
-                page: 0,
-                size: 6,
-                sortBy: "createdAt",
-                direction: "desc",
-            });
-
-            const papers =
-                paperRes?.result?.content ||
-                paperRes?.content ||
-                paperRes?.result ||
-                [];
-
-            setSuggested(papers.slice(0, 3));
-
-            // 2. Dashboard Statistics
-            const statRes = await authService.getDashboardStatistics();
-            setTotalPublications(statRes.totalPublications);
-            setSavedPublications(statRes.savedPublications);
-            setFollowedTopics(statRes.followedTopics || []);
-
-            // 3. Top Keywords
-            const keywordRes = await authService.getTopKeywords();
-            setKeywords(keywordRes || []);
-
-            // 4. Follow Authors
-            const authorRes = await authService.getFollowAuthors();
-            setAuthors(authorRes || []);
-
-            // 5. Paper Per Year
-            const yearRes = await authService.getPaperPerYear();
-            setPaperPerYear(yearRes || []);
-
-        } catch (err) {
-            console.error(err);
-            setError("Unable to load dashboard.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    loadDashboard();
-}, []);
+	const searchHistory = [
+		'Machine Learning in Medicine',
+		'Neural-Channel Biology',
+		'Quantum Computing Trends',
+	];
 
 	return (
 		<div className="dashboard-root">
@@ -143,76 +110,41 @@ export default function Dashboard() {
 								<h3>Followed Topics</h3>
 							</div>
 							<div className="topics-tags">
-								{followedTopics.length === 0 ? (
-    							<div>No followed topics.</div>
-								) : (
-    							followedTopics.map((topic) => (
-        						<button
-            						key={topic.topicId}
-            						className="topic-tag"
-        						>
-            						{topic.topicName}
-        						</button>
-    							))
-							)}
+								{topicsList.map((topic, i) => (
+									<button key={i} className="topic-tag">{topic.name}</button>
+								))}
 							</div>
 						</div>
 
 						<div className="panel">
-    						<h3>Follow Authors</h3>
-    						<div className="history-items">
-        						{authors.length === 0 ? (
-            					<div className="history-item">
-                				No followed authors.
-            					</div>
-        						) : (
-            					authors.map((author) => (
-                				<div
-                    			key={author.authorId}
-                    			className="history-item"
-                				>
-                    			👤 {author.fullName}
-                				</div>
-            					))
-        					)}
-    					</div>
-					</div>
-					
-						<div className="panel">
-    						<h3>Top 10 Keywords</h3>
-    						<div className="history-items">
-        						{keywords.map((keyword, index) => (
-            					<div 
-								key={keyword.keyword || index}
-								className="history-item"
-								>
-                					{keyword.keyword || keyword}
-            					</div>
-        					))}
-    						</div>
+							<h3>Search History</h3>
+							<div className="history-items">
+								{searchHistory.map((item, i) => (
+									<div key={i} className="history-item">
+										<span>⚙</span>
+										{item}
+									</div>
+								))}
+							</div>
 						</div>
 
 						<div className="panel chart-panel">
 							<h3>Total Paper Per Year</h3>
 							<div className="chart-placeholder">
 								<div className="chart-bars">
-    							{paperPerYear.map(item => (
-        						<div
-            						key={item.year}
-            						className="bar"
-            						style={{
-                						height: `${(item.total || item.totalPaper || item.count) * 5}px`
-            						}}
-        						/>
-    							))}
-							</div>
+									<div className="bar" style={{ height: '30%' }}></div>
+									<div className="bar" style={{ height: '50%' }}></div>
+									<div className="bar" style={{ height: '70%' }}></div>
+									<div className="bar" style={{ height: '45%' }}></div>
+									<div className="bar" style={{ height: '60%' }}></div>
+								</div>
 							</div>
 							<div className="chart-labels">
-    							{paperPerYear.map(item => (
-								<span key={item.year}>
-            						{item.year}
-        						</span>
-							    ))}
+								<span>2020</span>
+								<span>2021</span>
+								<span>2022</span>
+								<span>2023</span>
+								<span>2024</span>
 							</div>
 						</div>
 					</aside>
@@ -243,4 +175,3 @@ export default function Dashboard() {
 		</div>
 	);
 }
-
