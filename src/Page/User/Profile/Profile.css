@@ -1,0 +1,92 @@
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+/* Card chung */
+.profile-card,
+.change-password-card {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 24px;
+  padding: 28px;
+  background: white;
+}
+
+.profile-card h2,
+.change-password-card h2 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.profile-card p {
+  color: #64748b;
+  font-size: 18px;
+  margin-bottom: 35px;
+}
+
+/* Layout 2 cột */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 35px;
+}
+
+/* Label */
+.profile-input-group label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+/* Input */
+.profile-input-group input {
+  width: 100%;
+  height: 55px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid #94a3b8;
+  padding: 0 18px;
+  font-size: 16px;
+  color: #111827;
+  background: #f8fafc;
+  outline: none;
+}
+
+/* hiệu ứng khi focus */
+.profile-input-group input:focus {
+  border-color: #183b72;
+  background: white;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+  .profile-page {
+    padding: 15px;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-card,
+  .change-password-card {
+    padding: 20px;
+  }
+
+  .profile-card h2,
+  .change-password-card h2 {
+    font-size: 22px;
+  }
+}

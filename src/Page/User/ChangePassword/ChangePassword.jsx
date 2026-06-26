@@ -1,10 +1,8 @@
 ﻿import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import userService from "../../../Services/userService";
 import "./ChangePassword.css";
 
 export default function ChangePassword() {
-  const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -50,18 +48,14 @@ export default function ChangePassword() {
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1200);
       } else {
         setMessage(response?.message || "Password change failed.");
       }
     } catch (error) {
       setMessage(
         error.response?.data?.message ||
-          error.message ||
-          "Password change failed. Please try again."
+        error.message ||
+        "Password change failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -69,48 +63,47 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="change-password-page">
-      <div className="change-password-card">
-        <h2>Change Password</h2>
+    <div className="change-password-card">
+      <h2>Change Password</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Current Password</label>
-            <input
-              type="password"
-              placeholder="Enter current password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-            />
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div className="change-form-group">
+          <label>Current Password</label>
+          <input
+            type="text"
+            placeholder="Enter current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+        </div>
 
-          <div className="form-group">
-            <label>New Password</label>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-          </div>
+        <div className="change-form-group">
+          <label>New Password</label>
+          <input
+            type="text"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </div>
 
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm new password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </div>
+        <div className="change-form-group">
+          <label>Confirm Password</label>
+          <input
+            type="text"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
 
-          {message && <p className="error-message">{message}</p>}
+        {message && <p className="change-error-message">{message}</p>}
 
-          <button className="change-btn" type="submit" disabled={loading}>
-            {loading ? "Processing..." : "Change Password"}
-          </button>
-        </form>
-      </div>
+        <button className="change-btn" type="submit" disabled={loading}>
+          {loading ? "Processing..." : "Change Password"}
+        </button>
+      </form>
     </div>
+
   );
 }
