@@ -105,12 +105,6 @@ const PaperDetail = () => {
               <span key={index}>{keyword}</span>
             ))}
           </div>
-        <h3>Topics</h3>
-          <div className="topic-list">
-            {paper.topics?.map((topic, index) => (
-              <span key={index}>{topic}</span>
-            ))}
-          </div>
         </div>
       </div>
 
