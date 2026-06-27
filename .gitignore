@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Tránh push code backend lên repo frontend
+Publication-Trend-Tracking-System-develop
