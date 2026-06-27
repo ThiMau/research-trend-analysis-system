@@ -1,0 +1,22 @@
+.filter-bar{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.filter-bar select{
+
+    min-width:180px;
+    height:42px;
+
+    border:1px solid #dbe1ea;
+    border-radius:8px;
+
+    background:white;
+
+    padding:0 12px;
+
+    font-size:14px;
+
+}
