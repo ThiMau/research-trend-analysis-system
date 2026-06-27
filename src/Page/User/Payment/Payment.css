@@ -1,0 +1,28 @@
+.payment-container {
+    padding: 40px;
+}
+
+.payment-content {
+    display: flex;
+    gap: 40px;
+}
+
+.premium-list {
+    width: 40%;
+}
+
+.payment-info {
+    width: 60%;
+}
+
+.premium-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.premium-card.active {
+    border: 2px solid blue;
+}
