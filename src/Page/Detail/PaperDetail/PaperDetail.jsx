@@ -98,14 +98,14 @@ const PaperDetail = () => {
         <p className="abstract">{paper.paperAbstract}</p>
 
         <div className="metadata">
-          <h3>Publication Metadata</h3>
+          <h3>Keywords</h3>
 
           <div className="keyword-list">
             {paper.keywords?.map((keyword, index) => (
               <span key={index}>{keyword}</span>
             ))}
           </div>
-
+        <h3>Topics</h3>
           <div className="topic-list">
             {paper.topics?.map((topic, index) => (
               <span key={index}>{topic}</span>

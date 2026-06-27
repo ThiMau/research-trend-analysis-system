@@ -7,6 +7,8 @@ function AuthorDetail() {
   const { authorId } = useParams();
 
   const [author, setAuthor] = useState(null);
+  const [isFollowed,setIsFollowed]=useState(false);
+
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,7 +31,26 @@ function AuthorDetail() {
         authorRes?.result || authorRes;
 
       setAuthor(authorData);
+try{
 
+const followRes =
+await userService.getFollowAuthors();
+
+const followed =
+followRes.data?.result ||
+followRes.result ||
+[];
+
+setIsFollowed(
+
+followed.some(
+(item)=>
+item.authorId===Number(authorId)
+)
+
+);
+
+}catch{}
       // fetch papers
       const papersRes =
         await userService.getPapers({
@@ -60,7 +81,29 @@ function AuthorDetail() {
       setLoading(false);
     }
   };
+const handleFollow = async()=>{
 
+try{
+
+if(isFollowed){
+
+await userService.unfollowAuthor(authorId);
+
+}else{
+
+await userService.followAuthor(authorId);
+
+}
+
+setIsFollowed(!isFollowed);
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
   if (loading) {
     return (
       <div className="author-loading">
@@ -95,7 +138,24 @@ function AuthorDetail() {
             ?.charAt(0)
             ?.toUpperCase()}
         </div>
+            <div className="author-actions">
 
+            <button
+            className={
+            isFollowed
+            ? "follow-btn followed"
+            : "follow-btn"
+            }
+            onClick={handleFollow}
+            >
+
+            {isFollowed
+            ? "Unfollow"
+            : "Follow Author"}
+
+            </button>
+
+            </div>
         <div>
           <h1>{author.fullName}</h1>
 

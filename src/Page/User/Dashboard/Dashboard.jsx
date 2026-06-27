@@ -43,34 +43,102 @@ function PaperCard({ paper }) {
 }
 
 export default function Dashboard() {
+	const [user, setUser] = useState(null);
+
+	const [totalPapers, setTotalPapers] = useState(0);
+
+	const [followTopics, setFollowTopics] = useState([]);
+
+	const [trendingTopics, setTrendingTopics] = useState([]);
+
+	const [publicationGrowth, setPublicationGrowth] = useState(0);
+
 	const [suggested, setSuggested] = useState([]);
+
 	const [loading, setLoading] = useState(true);
+
 	const [error, setError] = useState("");
 
 	useEffect(() => {
-		const loadSuggested = async () => {
-			setLoading(true);
-			setError("");
+
+		const loadDashboard = async () => {
 
 			try {
-				const res = await userService.getPapers({
+
+				setLoading(true);
+
+				// User
+				const me = await userService.getMe();
+				setUser(me.result);
+
+				// Papers
+				const papers = await userService.getPapers({
 					page: 0,
-					size: 6,
-					sortBy: 'createdAt',
-					direction: 'desc',
+					size: 1,
 				});
 
-				const list = res?.result?.content || res?.content || res?.result || [];
-				setSuggested(list.slice(0, 3));
-			} catch (err) {
-				console.error(err);
-				setError('Unable to load suggested papers. Please refresh.');
-			} finally {
-				setLoading(false);
+				setTotalPapers(
+					papers.result?.totalElements || 0
+				);
+
+				// Suggested Papers
+				setSuggested(
+					papers.result?.content?.slice(0, 3) || []
+				);
+
+				// Follow Topics
+				const follows = await userService.getFollowTopics();
+
+				setFollowTopics(follows.result || []);
+
+				// Trending Topics
+				const trends = await userService.getTrendingTopics();
+
+				setTrendingTopics(
+					trends.result?.slice(0, 5) || []
+				);
+
+				// Publication Trend
+				const year = new Date().getFullYear();
+
+				const trend = await userService.getPublicationTrends({
+					fromYear: year,
+					toYear: year
+				});
+
+				const result = trend.result || [];
+
+				if (result.length >= 2) {
+
+					const current = result[result.length - 1].count;
+
+					const previous = result[result.length - 2].count;
+
+					const percent =
+						previous === 0
+							? 100
+							: ((current - previous) / previous * 100);
+
+					setPublicationGrowth(percent);
+
+				}
+
 			}
+			catch (err) {
+
+				console.error(err);
+
+			}
+			finally {
+
+				setLoading(false);
+
+			}
+
 		};
 
-		loadSuggested();
+		loadDashboard();
+
 	}, []);
 
 	const topicsList = [
@@ -92,7 +160,7 @@ export default function Dashboard() {
 			<main className="dashboard-main">
 				<header className="dashboard-header-top">
 					<div className="welcome-section">
-						<h1 className="welcome-title">Welcome back, Ben.</h1>
+						<h1 className="welcome-title">Welcome {user?.fullName || user?.username || "User"}</h1>
 						<p className="welcome-subtitle">Reviewing the latest trends in Neural Architecture Search and CRISPR editing.</p>
 					</div>
 				</header>
@@ -129,7 +197,7 @@ export default function Dashboard() {
 						</div>
 
 						<div className="panel chart-panel">
-							<h3>Total Paper Per Year</h3>
+							<h3>Publication This Month</h3>
 							<div className="chart-placeholder">
 								<div className="chart-bars">
 									<div className="bar" style={{ height: '30%' }}></div>
@@ -156,20 +224,20 @@ export default function Dashboard() {
 								<div className="sort">Sort by Relevance</div>
 							</div>
 
-                            <div className="papers-list">
-                                {loading && <div>Loading suggested papers...</div>}
-                                {error && <div className="error-message">{error}</div>}
-                                {!loading && !error && suggested.length === 0 && (
-                                    <div>No suggested papers available.</div>
-                                )}
-                                {!loading && suggested.map((paper) => (
-                                    <PaperCard key={paper.paperId || paper.id} paper={paper} />
-                                ))}
-                            </div>
-                        </div>
+							<div className="papers-list">
+								{loading && <div>Loading suggested papers...</div>}
+								{error && <div className="error-message">{error}</div>}
+								{!loading && !error && suggested.length === 0 && (
+									<div>No suggested papers available.</div>
+								)}
+								{!loading && suggested.map((paper) => (
+									<PaperCard key={paper.paperId || paper.id} paper={paper} />
+								))}
+							</div>
+						</div>
 
-                        <div className="view-more">View More Suggestions</div>
-                    </section>
+						<div className="view-more">View More Suggestions</div>
+					</section>
 				</section>
 			</main>
 		</div>

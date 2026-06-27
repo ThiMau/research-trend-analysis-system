@@ -12,6 +12,16 @@ export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const initialKeyword = searchParams.get("keyword") || "";
 
+  const [years, setYears] = useState([]);
+  const [topics, setTopics] =useState([]);
+  const [keywords, setKeywords] = useState([]);
+  const [journals, setJournals] = useState([]);
+
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedKeyword, setSelectedKeyword] = useState("");
+  const [selectedJournal, setSelectedJournal] = useState("");
+
   const [keyword, setKeyword] = useState(initialKeyword);
   const [papers, setPapers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,6 +35,11 @@ export default function SearchPage() {
       const res = await axiosClient.get("/api/member/papers", {
         params: {
           keyword: searchTerm,
+          year: selectedYear,
+          topic: selectedTopic,
+          keywordFilter: selectedKeyword,
+          journal: selectedJournal,
+
           page,
           size,
           sortBy: "createdAt",
@@ -43,6 +58,36 @@ export default function SearchPage() {
     }
   }, [keyword]);
 
+const loadFilters = async () => {
+  try {
+    const [
+      yearsRes,
+      topicsRes,
+      keywordsRes,
+      journalsRes,
+    ] = await Promise.all([
+      axiosClient.get("/api/member/papers/filters/years"),
+      axiosClient.get("/api/member/papers/filters/topics"),
+      axiosClient.get("/api/member/papers/filters/keywords"),
+      axiosClient.get("/api/member/papers/filters/journals"),
+    ]);
+
+    setYears(yearsRes.data.result || []);
+    setTopics(topicsRes.data.result || []);
+    setKeywords(keywordsRes.data.result || []);
+    setJournals(journalsRes.data.result || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const [filtersLoaded, setFiltersLoaded] = useState(false);
+// Load filter
+useEffect(() => {
+  loadFilters();
+}, []);
+
+// Search khi mở trang bằng keyword
   useEffect(() => {
     if (initialKeyword) {
       (async () => {
@@ -50,6 +95,15 @@ export default function SearchPage() {
       })();
     }
   }, [initialKeyword, handleSearch]);
+  // Search khi đổi filter
+useEffect(() => {
+  handleSearch();
+}, [
+  selectedYear,
+  selectedTopic,
+  selectedKeyword,
+  selectedJournal,
+]);
 
   return (
     <div className="search-page">
@@ -71,6 +125,81 @@ export default function SearchPage() {
           Search
         </button>
       </div>
+
+      <div className="filter-bar">
+
+    <select
+        value={selectedYear}
+        onChange={(e)=>setSelectedYear(e.target.value)}
+    >
+        <option value="">All Years</option>
+
+        {years.map(item=>(
+            <option
+                key={item.value}
+                value={item.value}
+            >
+                {item.label} ({item.count})
+            </option>
+        ))}
+    </select>
+
+    <select
+        value={selectedTopic}
+        onChange={(e)=>setSelectedTopic(e.target.value)}
+    >
+        <option value="">All Topics</option>
+
+        {topics.map(item=>(
+            <option
+                key={item.value}
+                value={item.value}
+            >
+                {item.label} ({item.count})
+            </option>
+        ))}
+    </select>
+
+    <select
+        value={selectedKeyword}
+        onChange={(e)=>setSelectedKeyword(e.target.value)}
+    >
+        <option value="">All Keywords</option>
+
+        {keywords.map(item=>(
+            <option
+                key={item.value}
+                value={item.value}
+            >
+                {item.label} ({item.count})
+            </option>
+        ))}
+    </select>
+
+    <select
+        value={selectedJournal}
+        onChange={(e)=>setSelectedJournal(e.target.value)}
+    >
+        <option value="">All Journals</option>
+
+        {journals.map(item=>(
+            <option
+                key={item.value}
+                value={item.value}
+            >
+                {item.label} ({item.count})
+            </option>
+        ))}
+    </select>
+
+    <button
+        className="search-btn"
+        onClick={()=>handleSearch()}
+    >
+        Apply Filters
+    </button>
+
+</div>
 
       <div className="quick-tags">
         <span>Quick tags:</span>

@@ -6,6 +6,7 @@ import "./JournalDetail.css";
 const JournalDetail = () => {
   const { journalId } = useParams();
   const navigate = useNavigate();
+  const [isFollowed, setIsFollowed] = useState(false);
 
   const [journal, setJournal] = useState(null);
   const [papers, setPapers] = useState([]);
@@ -27,6 +28,30 @@ const JournalDetail = () => {
 
       setJournal(journalData);
       setPapers(papersData);
+      try {
+
+    const followRes =
+        await userService.getFollowJournals();
+
+    const followed =
+        followRes.data?.result ||
+        followRes.result ||
+        [];
+
+    setIsFollowed(
+
+        followed.some(
+            (item) =>
+                item.journalId ===
+                Number(journalId)
+        )
+
+    );
+
+} catch {
+console.error(err);
+}
+
     } catch (err) {
       console.error(err);
       setError(
@@ -37,6 +62,34 @@ const JournalDetail = () => {
       setLoading(false);
     }
   };
+
+const handleFollow = async () => {
+
+    try {
+
+        if (isFollowed) {
+
+            await userService.unfollowJournal(
+                journalId
+            );
+
+        } else {
+
+            await userService.followJournal(
+                journalId
+            );
+
+        }
+
+        setIsFollowed(!isFollowed);
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+};
 
   if (loading) {
     return <div>Loading...</div>;
@@ -64,6 +117,20 @@ const JournalDetail = () => {
           onClick={() => navigate(-1)}
         >
           ← Back
+        </button>
+
+      <button
+        className={
+            isFollowed
+                ? "follow-btn followed"
+                : "follow-btn"
+        }
+        onClick={handleFollow}
+      >
+        {isFollowed
+            ? "Unfollow"
+            : "Follow Journal"}
+
         </button>
 
         <h1>{journal.name || journal.title}</h1>
