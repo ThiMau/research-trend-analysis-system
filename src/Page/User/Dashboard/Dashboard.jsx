@@ -3,11 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userService from '../../../Services/userService';
 
-const stats = [
-	{ label: 'Saved Publications', value: 128 },
-	{ label: 'Recent Views', value: 42 },
-	{ label: 'Followed Topics', value: 14 },
-];
 
 function StatCard({ label, value }) {
 	return (
@@ -49,9 +44,15 @@ export default function Dashboard() {
 
 	const [followTopics, setFollowTopics] = useState([]);
 
-	const [trendingTopics, setTrendingTopics] = useState([]);
+	const [savedPapers, setSavedPapers] = useState(0);
 
-	const [publicationGrowth, setPublicationGrowth] = useState(0);
+	const [followAuthors, setFollowAuthors] = useState([]);
+
+	const [topKeywords, setTopKeywords] = useState([]);
+
+	const [topJournals, setTopJournals] = useState([]);
+
+	const [publicationTrends, setPublicationTrends] = useState([]);
 
 	const [suggested, setSuggested] = useState([]);
 
@@ -67,40 +68,31 @@ export default function Dashboard() {
 
 				setLoading(true);
 
-				// User
-				const me = await userService.getMe();
-				setUser(me.result);
+				const [
+					me,
+					papers,
+					follows,
+					keywords,
+					journals,
+					trends
+				] = await Promise.all([
+					userService.getMe(),
+					userService.getPapers({
+						page: 0,
+						size: 10,
+					}),
 
-				// Papers
-				const papers = await userService.getPapers({
-					page: 0,
-					size: 1,
-				});
-
-				setTotalPapers(
-					papers.result?.totalElements || 0
+					userService.getFollowTopics(),
+					userService.getTopKeywords(),
+					userService.getTopJournals(),
+					userService.getPublicationTrends()
+				]);
+				setTopKeywords(
+					keywords.result || []
 				);
-
-				// Suggested Papers
-				setSuggested(
-					papers.result?.content?.slice(0, 3) || []
+				setTopJournals(
+					journals.result || []
 				);
-
-				// Follow Topics
-				const follows = await userService.getFollowTopics();
-
-				setFollowTopics(follows.result || []);
-
-				// Trending Topics
-				const trends = await userService.getTrendingTopics();
-
-				setTrendingTopics(
-					trends.result?.slice(0, 5) || []
-				);
-
-				// Publication Trend
-				const year = new Date().getFullYear();
-
 				const trend = await userService.getPublicationTrends({
 					fromYear: year,
 					toYear: year
@@ -119,8 +111,9 @@ export default function Dashboard() {
 							? 100
 							: ((current - previous) / previous * 100);
 
-					setPublicationGrowth(percent);
-
+					setPublicationTrends(
+						trends.result || []
+					);
 				}
 
 			}
@@ -141,20 +134,6 @@ export default function Dashboard() {
 
 	}, []);
 
-	const topicsList = [
-		{ name: 'Machine Learning' },
-		{ name: 'Genetics' },
-		{ name: 'Biotech' },
-		{ name: 'Quantum Computing' },
-		{ name: 'AI Ethics' },
-	];
-
-	const searchHistory = [
-		'Machine Learning in Medicine',
-		'Neural-Channel Biology',
-		'Quantum Computing Trends',
-	];
-
 	return (
 		<div className="dashboard-root">
 			<main className="dashboard-main">
@@ -166,9 +145,25 @@ export default function Dashboard() {
 				</header>
 
 				<section className="stats-row">
-					{stats.map((s) => (
-						<StatCard key={s.label} label={s.label} value={s.value} />
-					))}
+					<StatCard
+						label="Total Publications"
+						value={totalPapers}
+					/>
+
+					<StatCard
+						label="Saved Publications"
+						value={savedPapers}
+					/>
+
+					<StatCard
+						label="Followed Topics"
+						value={followTopics.length}
+					/>
+
+					<StatCard
+						label="Followed Authors"
+						value={followAuthors.length}
+					/>
 				</section>
 
 				<section className="content-grid">
@@ -178,8 +173,17 @@ export default function Dashboard() {
 								<h3>Followed Topics</h3>
 							</div>
 							<div className="topics-tags">
-								{topicsList.map((topic, i) => (
-									<button key={i} className="topic-tag">{topic.name}</button>
+								{topicsList.map((journal) => (
+									<button
+										key={journal.journalName}
+										className="topic-tag"
+									>
+										{journal.journalName}
+
+										<span className="topic-count">
+											{journal.paperCount}
+										</span>
+									</button>
 								))}
 							</div>
 						</div>
@@ -187,10 +191,20 @@ export default function Dashboard() {
 						<div className="panel">
 							<h3>Search History</h3>
 							<div className="history-items">
-								{searchHistory.map((item, i) => (
-									<div key={i} className="history-item">
-										<span>⚙</span>
-										{item}
+								{topKeywords.map((keyword) => (
+									<div
+										key={keyword.keywordName}
+										className="history-item"
+									>
+										<span>🏷</span>
+
+										<span className="history-name">
+											{keyword.keywordName}
+										</span>
+
+										<span className="history-count">
+											{keyword.paperCount}
+										</span>
 									</div>
 								))}
 							</div>
@@ -198,15 +212,10 @@ export default function Dashboard() {
 
 						<div className="panel chart-panel">
 							<h3>Publication This Month</h3>
-							<div className="chart-placeholder">
-								<div className="chart-bars">
-									<div className="bar" style={{ height: '30%' }}></div>
-									<div className="bar" style={{ height: '50%' }}></div>
-									<div className="bar" style={{ height: '70%' }}></div>
-									<div className="bar" style={{ height: '45%' }}></div>
-									<div className="bar" style={{ height: '60%' }}></div>
-								</div>
-							</div>
+							<Chart
+								title="Publication Trends"
+								data={publicationTrends}
+							/>
 							<div className="chart-labels">
 								<span>2020</span>
 								<span>2021</span>
