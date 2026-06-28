@@ -1,0 +1,56 @@
+.payment-history{
+    background:#fff;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+    overflow:auto;
+}
+
+.payment-history table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.payment-history th{
+    text-align:left;
+    background:#2563eb;
+    color:#fff;
+    padding:12px;
+}
+
+.payment-history td{
+    padding:12px;
+    border-bottom:1px solid #eee;
+}
+
+.payment-history tr:hover{
+    background:#f8fafc;
+}
+
+.empty{
+    text-align:center;
+    padding:40px;
+    color:#777;
+}
+
+.status{
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.status.SUCCESS{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.status.PENDING{
+    background:#fef3c7;
+    color:#b45309;
+}
+
+.status.FAILED{
+    background:#fee2e2;
+    color:#dc2626;
+}

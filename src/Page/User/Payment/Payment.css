@@ -1,28 +1,75 @@
-.payment-container {
-    padding: 40px;
+.payment-page{
+    max-width:800px;
+    margin:auto;
+    padding:40px 20px;
 }
 
-.payment-content {
-    display: flex;
-    gap: 40px;
+.payment-loading{
+    text-align:center;
+    padding:120px;
+    font-size:20px;
 }
 
-.premium-list {
-    width: 40%;
+.invoice-card{
+    background:#fff;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+    margin-bottom:30px;
 }
 
-.payment-info {
-    width: 60%;
+.invoice-row{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:15px;
 }
 
-.premium-card {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-bottom: 15px;
-    cursor: pointer;
-    border-radius: 10px;
+.total{
+    margin-top:20px;
+    padding-top:15px;
+    border-top:1px solid #ddd;
+    font-size:18px;
 }
 
-.premium-card.active {
-    border: 2px solid blue;
+.payment-card{
+    background:#fff;
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+}
+
+.payment-qr{
+    width:260px;
+    max-width:100%;
+    margin-bottom:25px;
+}
+
+.checkout-btn,
+.subscription-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+    margin-top:15px;
+}
+
+.checkout-btn{
+    background:#2563eb;
+    color:#fff;
+}
+
+.checkout-btn:hover{
+    background:#1d4ed8;
+}
+
+.subscription-btn{
+    background:#10b981;
+    color:#fff;
+}
+
+.subscription-btn:hover{
+    background:#059669;
 }

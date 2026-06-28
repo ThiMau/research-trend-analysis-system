@@ -166,3 +166,20 @@
   height: 100%;
   background: #16a34a;
 }
+.folder-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.secondary-btn {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: #f3f4f6;
+}

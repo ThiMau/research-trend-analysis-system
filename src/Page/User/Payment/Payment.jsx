@@ -1,92 +1,117 @@
 import { useEffect, useState } from "react";
-import userService from "../../Services/userService";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./Payment.css";
 
-function Payment() {
-    const [premiums, setPremiums] = useState([]);
-    const [selectedPremium, setSelectedPremium] = useState(null);
-    const [invoice, setInvoice] = useState(null);
-    const [qrCode, setQrCode] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState("");
+import paymentService from "../../../Services/paymentService";
 
-    useEffect(() => {
-        loadPremiums();
-    }, []);
+export default function Payment() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const loadPremiums = async () => {
-        try {
-            const response = await userService.getPremiums();
-            setPremiums(response.result || []);
-        } catch (error) {
-            console.log(error);
-        }
-    };
+  const invoice = location.state?.invoice;
 
-    const handleSelectPremium = (premium) => {
-        setSelectedPremium(premium);
-    };
+  const [payment, setPayment] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const handlePayment = async () => {
-        if (!selectedPremium) {
-            alert("Please select premium package");
-            return;
-        }
+  useEffect(() => {
+    if (!invoice) {
+      navigate("/premium");
+      return;
+    }
 
-        try {
-            setLoading(true);
+    createPayment();
+  }, []);
 
-            const invoiceResponse =
-                await userService.createInvoice({
-                    premiumId: selectedPremium.premiumId
-                });
+  const createPayment = async () => {
+    try {
+      setLoading(true);
 
-            const invoiceData = invoiceResponse.result;
+      const response = await paymentService.createPayment(
+        invoice.invoiceId
+      );
 
-            setInvoice(invoiceData);
+      if (response.code === 0) {
+        setPayment(response.result);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Cannot create payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            const paymentResponse =
-                await userService.createPayment(
-                    invoiceData.invoiceId
-                );
-
-            setQrCode(
-                paymentResponse.result.qrCode
-            );
-
-        } catch (error) {
-            console.log(error);
-            alert("Payment creation failed");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleCheckPayment = async () => {
-        try {
-            const response =
-                await userService.getCurrentSubscription();
-
-            if (response.result?.premium) {
-                setMessage(
-                    "Payment successful. Premium activated!"
-                );
-            } else {
-                setMessage(
-                    "Payment not completed yet"
-                );
-            }
-
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
+  if (loading) {
     return (
-        <div className="payment-container">
-            ...
-        </div>
+      <div className="payment-loading">
+        Creating Payment...
+      </div>
     );
-}
+  }
 
-export default Payment;
+  return (
+    <div className="payment-page">
+
+      <h1>Complete Payment</h1>
+
+      <div className="invoice-card">
+
+        <div className="invoice-row">
+          <span>Package</span>
+          <strong>{invoice.packageName}</strong>
+        </div>
+
+        <div className="invoice-row">
+          <span>Original Price</span>
+          <strong>
+            {Number(invoice.originalAmount).toLocaleString()} VNĐ
+          </strong>
+        </div>
+
+        <div className="invoice-row">
+          <span>Discount</span>
+          <strong>
+            {Number(invoice.discountAmount).toLocaleString()} VNĐ
+          </strong>
+        </div>
+
+        <div className="invoice-row total">
+          <span>Final Price</span>
+          <strong>
+            {Number(invoice.finalAmount).toLocaleString()} VNĐ
+          </strong>
+        </div>
+
+      </div>
+
+      {payment && (
+        <div className="payment-card">
+
+          <img
+            src={payment.qrCode}
+            alt="QR Code"
+            className="payment-qr"
+          />
+
+          <button
+            className="checkout-btn"
+            onClick={() =>
+              window.open(payment.checkoutUrl, "_blank")
+            }
+          >
+            Open Checkout
+          </button>
+
+          <button
+            className="subscription-btn"
+            onClick={() => navigate("/subscription")}
+          >
+            Check Subscription
+          </button>
+
+        </div>
+      )}
+
+    </div>
+  );
+}

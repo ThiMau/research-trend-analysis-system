@@ -2,6 +2,12 @@ import { Search, Gift, Bell, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SearchBar.css";
+import {
+  Search,
+  Crown,
+  Bell,
+  User
+} from "lucide-react";
 
 export default function SearchBar({ showInput = true }) {
   const [darkMode, setDarkMode] = useState(false);
@@ -43,9 +49,12 @@ export default function SearchBar({ showInput = true }) {
 
       <div className="searchbar-actions">
 
-        <div className="offer">
-          <Gift size={16} />
-          <span>Free Offer</span>
+        <div
+          className="offer premium-offer"
+          onClick={() => navigate("/premium")}
+        >
+          <Crown size={16} />
+          <span>Premium</span>
         </div>
 
         <Bell size={18} className="icon-btn" />
