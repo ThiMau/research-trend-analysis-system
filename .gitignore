@@ -23,4 +23,4 @@ dist-ssr
 *.sln
 *.sw?
 # Tránh push code backend lên repo frontend
-Publication-Trend-Tracking-System-develop
+Publication-Trend-Tracking-System/
