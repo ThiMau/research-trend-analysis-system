@@ -89,3 +89,16 @@
 .setting-menu button:hover {
   background: #f5f7fc;
 }
+.premium-offer{
+    cursor:pointer;
+    color:#d97706;
+    transition:.2s;
+}
+
+.premium-offer:hover{
+    color:#b45309;
+}
+
+.premium-offer svg{
+    color:#f59e0b;
+}

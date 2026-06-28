@@ -1,0 +1,125 @@
+.invoice-overlay{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    z-index:999;
+}
+
+.invoice-modal{
+
+    width:500px;
+    max-width:95%;
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:30px;
+
+    animation:popup .25s ease;
+}
+
+@keyframes popup{
+
+    from{
+
+        transform:scale(.8);
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+        opacity:1;
+
+    }
+
+}
+
+.invoice-modal h2{
+
+    margin-top:0;
+    margin-bottom:25px;
+
+    text-align:center;
+}
+
+.invoice-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:15px;
+
+    font-size:16px;
+}
+
+.invoice-description{
+
+    margin:20px 0;
+
+    padding:15px;
+
+    background:#f8fafc;
+
+    border-radius:10px;
+
+    color:#555;
+}
+
+.invoice-actions{
+
+    display:flex;
+
+    gap:15px;
+}
+
+.cancel-btn{
+
+    flex:1;
+
+    border:none;
+
+    background:#d1d5db;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+}
+
+.confirm-btn{
+
+    flex:1;
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+}
+
+.confirm-btn:hover{
+
+    background:#1d4ed8;
+}

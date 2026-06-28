@@ -1,0 +1,24 @@
+.premium-page{
+    padding:30px;
+}
+
+.premium-page h1{
+    margin-bottom:10px;
+}
+
+.premium-page p{
+    color:#666;
+    margin-bottom:30px;
+}
+
+.premium-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:25px;
+}
+
+.premium-loading{
+    padding:100px;
+    text-align:center;
+    font-size:18px;
+}

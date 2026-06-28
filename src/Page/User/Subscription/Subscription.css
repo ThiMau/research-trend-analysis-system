@@ -1,0 +1,15 @@
+.subscription-page{
+    max-width:800px;
+    margin:auto;
+    padding:30px;
+}
+
+.subscription-page h1{
+    margin-bottom:25px;
+}
+
+.subscription-loading{
+    padding:100px;
+    text-align:center;
+    font-size:18px;
+}

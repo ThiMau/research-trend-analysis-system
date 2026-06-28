@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import userService from "../../../Services/userService";
 import "./PaperDetail.css";
+import Folder from "../../../components/Folder/Folder";
 
 const PaperDetail = () => {
   const { paperId } = useParams();
 
-  const [paper, setPaper] = useState(null);
+  const [showFolder, setShowFolder] = useState(false);
+  const [note, setNote] = useState("");
   const [journalDetail, setJournalDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,6 +26,9 @@ const PaperDetail = () => {
       fetchJournal(paper.journalId);
     }
   }, [paper?.journalId]);
+  useEffect(() => {
+    loadFolders();
+  }, []);
 
   const fetchPaper = async () => {
     try {
@@ -37,7 +42,45 @@ const PaperDetail = () => {
       setLoading(false);
     }
   };
+  const loadFolders = async () => {
+    try {
+      const res = await userService.getFolders();
 
+      const list = res.data.result || [];
+
+      setFolders(list);
+
+      if (list.length > 0) {
+        setSelectedFolder(list[0].folderId);
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const saveToFolder = async () => {
+
+    try {
+
+      await userService.addPaperToFolder(
+        selectedFolder,
+        paper.paperId,
+        note
+      );
+
+      alert("Saved successfully.");
+
+      setShowSaveDialog(false);
+
+    } catch (err) {
+
+      console.log(err);
+
+      alert("Cannot save paper.");
+
+    }
+
+  };
   const fetchJournal = async (journalId) => {
     try {
       const res = await userService.getJournalById(journalId);
@@ -80,7 +123,11 @@ const PaperDetail = () => {
         <div className="paper-info">Published: {paper.publicationYear}</div>
 
         <div className="action-buttons">
-          <button>Save to Folder</button>
+          <button
+            onClick={() => setShowFolder(true)}
+          >
+            Save to Folder
+          </button>
           <button
             onClick={() =>
               navigate("/report", {
@@ -147,6 +194,15 @@ const PaperDetail = () => {
           <Link to={`/journals/${paper.journalId}`}>View Journal</Link>
         </div>
       </div>
+      {showFolder && (
+        <Folder
+          paperId={paper.paperId}
+          note={note}
+          setNote={setNote}
+          showSaveDialog={showFolder}
+          setShowSaveDialog={setShowFolder}
+        />
+      )}
     </div>
   );
 };

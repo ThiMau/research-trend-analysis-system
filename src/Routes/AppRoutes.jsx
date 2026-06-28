@@ -20,6 +20,10 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import Sidebar from "../components/Sidebar/Sidebar";
 import SearchBar from "../components/SearchBar/SearchBar";
+import Payment from "../Page/User/Payment/Payment";
+import Premium from "../Page/User/Premium/Premium";
+import Subscription from "../Page/User/Subscription/Subscription";
+import PaymentHistory from "../Page/User/PaymentHistory/PaymentHistory";
 
 function MainLayout({ children, showSearchInput = true }) {
   return (
@@ -122,6 +126,50 @@ function AppRoutes() {
             <ProtectedRoute>
               <MainLayout>
                 <MyLibrary />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/premium"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Premium />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute>
+              <MainLayout showSearchInput={false}>
+                <Payment />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/subscription"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Subscription />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment-history"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <PaymentHistory />
               </MainLayout>
             </ProtectedRoute>
           }

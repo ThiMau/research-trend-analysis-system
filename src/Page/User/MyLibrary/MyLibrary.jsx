@@ -1,167 +1,121 @@
 import "./MyLibrary.css";
-import { useEffect, useState } from "react";
-import axiosClient from "../../../Api/axiosClient";
+import {useState} from "react";
+import Folder from "../../../components/Folder/Folder";
 
-export default function MyLibrary() {
-  const [papers, setPapers] = useState([]);
+export default function MyLibrary(){
 
-  useEffect(() => {
-    fetchPapers();
-  }, []);
+const [papers,setPapers]=useState([]);
+const [selectedFolder,setSelectedFolder]=useState(null);
 
-  const fetchPapers = async () => {
-    try {
-      const res = await axiosClient.get("/api/member/papers");
+const handleFolderChange=(folder,paperList)=>{
+setSelectedFolder(folder);
+setPapers(paperList);
+};
 
-      const list = res.data?.result?.content || [];
-      setPapers(list);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+return(
+<div className="library-page">
 
-  return (
-    <div className="library-page">
-      <div className="library-top">
-        <input
-          type="text"
-          placeholder="Search publications..."
-          className="library-search"
-        />
+<div className="library-top">
+<input
+type="text"
+placeholder="Search in current folder..."
+className="library-search"
+/>
+</div>
 
-        <button className="new-folder-btn">
-          + New Folder
-        </button>
-      </div>
+<div className="library-content">
 
-      <div className="library-content">
+<Folder
+onFolderChange={handleFolderChange}
+/>
 
-        {/* LEFT */}
+<div className="library-main">
 
-        <div className="library-sidebar">
+<div className="library-header">
 
-          <h4>COLLECTIONS</h4>
+<div>
+<h2>{selectedFolder?.folderName||"My Library"}</h2>
+<p>{papers.length} saved papers</p>
+</div>
 
-          <div className="collection active">
-            Bio-Ethics
-            <span>{papers.length}</span>
-          </div>
+</div>
 
-          <div className="collection">
-            Neural Networks
-            <span>0</span>
-          </div>
+<table className="library-table">
 
-          <div className="collection">
-            Genetic Algorithms
-            <span>0</span>
-          </div>
+<thead>
 
-          <div className="collection">
-            Climate Models
-            <span>0</span>
-          </div>
+<tr>
+<th>TITLE & ABSTRACT</th>
+<th>METADATA</th>
+<th>NOTE</th>
+<th>ACTIONS</th>
+</tr>
 
-        </div>
+</thead>
 
-        {/* RIGHT */}
+<tbody>
 
-        <div className="library-main">
+{papers.length===0?(
+<tr>
+<td colSpan="4" style={{textAlign:"center",padding:"40px"}}>
+No papers in this folder.
+</td>
+</tr>
+):(
 
-          <div className="library-header">
+papers.map((paper)=>(
 
-            <div>
-              <h2>Bio-Ethics Collection</h2>
-              <p>
-                Curated research on algorithmic bias and medical AI ethics.
-              </p>
-            </div>
+<tr key={paper.bookmarkId}>
 
-          </div>
+<td>
+<h4>{paper.title}</h4>
+<p>{paper.paperAbstract?.slice(0,120)}...</p>
+</td>
 
-          <table className="library-table">
+<td>
+<div className="meta">
+<span>{paper.authors?.[0]?.fullName}</span>
+<span>{paper.publicationYear}</span>
+<span>{paper.journalName}</span>
+</div>
+</td>
 
-            <thead>
-              <tr>
-                <th>TITLE & ABSTRACT</th>
-                <th>METADATA</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
+<td>
+{paper.note||"-"}
+</td>
 
-            <tbody>
+<td>
 
-              {papers.map((paper) => (
-                <tr key={paper.paperId}>
+<button
+className="action-btn"
+>
+Edit Note
+</button>
 
-                  <td>
-                    <h4>{paper.title}</h4>
+<button
+className="action-btn"
+style={{marginLeft:8}}
+>
+Remove
+</button>
 
-                    <p>
-                      {paper.paperAbstract?.slice(0, 120)}
-                      ...
-                    </p>
-                  </td>
+</td>
 
-                  <td>
-                    <div className="meta">
+</tr>
 
-                      <span>
-                        {paper.authors?.[0]?.fullName}
-                      </span>
+))
 
-                      <span>
-                        {paper.publicationYear}
-                      </span>
+)}
 
-                      <span>
-                        {paper.journalName}
-                      </span>
+</tbody>
 
-                    </div>
-                  </td>
+</table>
 
-                  <td>
-                    <button className="action-btn">
-                      View
-                    </button>
-                  </td>
+</div>
 
-                </tr>
-              ))}
+</div>
 
-            </tbody>
+</div>
+);
 
-          </table>
-
-          <div className="library-stats">
-
-            <div className="stat-card">
-              <span>READING PROGRESS</span>
-              <h3>68%</h3>
-
-              <div className="progress">
-                <div className="progress-fill"></div>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <span>ANNOTATIONS</span>
-              <h3>42</h3>
-              <p>+2 since yesterday</p>
-            </div>
-
-            <div className="stat-card">
-              <span>TREND ALIGNMENT</span>
-              <h3>High</h3>
-              <p>9/12 papers on peak growth</p>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  );
 }
