@@ -249,6 +249,54 @@ const userService = {
 
 
   // ======================
+  // PREMIUM PAYMENT
+  // ======================
+
+  // Lấy danh sách gói Premium
+  // TODO: Nếu backend đổi endpoint thì sửa ở đây
+  getPremiums: async () => {
+      const response = await axiosClient.get("/premiums");
+      return response.data;
+  },
+
+  // Tạo invoice
+  // Body hiện tại chỉ nhận:
+  // {
+  //    premiumId
+  // }
+  //
+  // TODO: Nếu sau này backend nhận thêm
+  // email, name, paymentMethod...
+  // thì sửa function này
+  createInvoice: async (data) => {
+      const response = await axiosClient.post(
+          "/invoices",
+          data
+      );
+      return response.data;
+  },
+
+  // Tạo payment và lấy QR
+  // TODO:
+  // Nếu backend đổi payment gateway
+  // chỉ cần sửa API này
+  createPayment: async (invoiceId) => {
+      const response = await axiosClient.post(
+          `/api/member/payments/${invoiceId}`
+      );
+      return response.data;
+  },
+
+  // Kiểm tra trạng thái premium sau thanh toán
+  // API này backend của bạn đã có
+  getCurrentSubscription: async () => {
+      const response = await axiosClient.get(
+          "/api/member/subscription/current"
+      );
+      return response.data;
+  },
+
+  // ======================
   // REPORTS
   // ======================
 

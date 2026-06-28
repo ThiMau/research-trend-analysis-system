@@ -2,7 +2,7 @@ import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userService from '../../../Services/userService';
-
+import Chart from '../../../components/Chart/Chart';
 
 function StatCard({ label, value }) {
 	return (
@@ -81,22 +81,24 @@ export default function Dashboard() {
 						page: 0,
 						size: 10,
 					}),
-
-					userService.getFollowTopics(),
-					userService.getTopKeywords(),
-					userService.getTopJournals(),
-					userService.getPublicationTrends()
+					userService.getFollowTopics().catch(() => ({ result: [] })),
+					userService.getTopKeywords().catch(() => ({ result: [] })),
+					userService.getTopJournals().catch(() => ({ result: [] })),
+					userService.getPublicationTrends().catch(() => ({ result: [] }))
 				]);
-				setTopKeywords(
-					keywords.result || []
-				);
-				setTopJournals(
-					journals.result || []
-				);
+                
+				setUser(me?.result || me);
+				setSuggested(papers?.result?.content || []);
+				setTotalPapers(papers?.result?.totalElements || 0);
+				setFollowTopics(follows?.result || []);
+				setTopKeywords(keywords?.result || []);
+				setTopJournals(journals?.result || []);
+
+				const year = new Date().getFullYear();
 				const trend = await userService.getPublicationTrends({
 					fromYear: year,
 					toYear: year
-				});
+				}).catch(() => ({ result: [] }));
 
 				const result = trend.result || [];
 
@@ -110,11 +112,9 @@ export default function Dashboard() {
 						previous === 0
 							? 100
 							: ((current - previous) / previous * 100);
-
-					setPublicationTrends(
-						trends.result || []
-					);
 				}
+
+				setPublicationTrends(trends?.result || []);
 
 			}
 			catch (err) {
@@ -173,7 +173,7 @@ export default function Dashboard() {
 								<h3>Followed Topics</h3>
 							</div>
 							<div className="topics-tags">
-								{topicsList.map((journal) => (
+								{topJournals.map((journal) => (
 									<button
 										key={journal.journalName}
 										className="topic-tag"
