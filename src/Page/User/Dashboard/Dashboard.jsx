@@ -48,11 +48,11 @@ export default function Dashboard() {
 
 	const [followAuthors, setFollowAuthors] = useState([]);
 
-	const [topKeywords, setTopKeywords] = useState([]);
-
-	const [topJournals, setTopJournals] = useState([]);
+	const [followJournals, setFollowJournals] = useState([]);
 
 	const [publicationTrends, setPublicationTrends] = useState([]);
+
+	const [subscription, setSubscription] = useState(null);
 
 	const [suggested, setSuggested] = useState([]);
 
@@ -70,19 +70,28 @@ export default function Dashboard() {
 
 				const [
 					me,
-					keywords,
+					topics,
+					authors,
 					journals,
-					trends
+					trends,
+					sub
 				] = await Promise.all([
 					userService.getMe(),
-					userService.getTopKeywords(),
-					userService.getTopJournals(),
-					userService.getPublicationTrend()
+					userService.getFollowTopics(),
+					userService.getFollowAuthors(),
+					userService.getFollowJournals(),
+					userService.getPublicationTrend(),
+					userService.getCurrentSubscription()
 				]);
 
 				setUser(me?.result || null);
-				setTopKeywords(keywords?.result || []);
-				setTopJournals(journals?.result || []);
+				setFollowTopics(topics?.result || []);
+
+				setFollowAuthors(authors?.result || []);
+
+				setFollowJournals(journals?.result || []);
+
+				setSubscription(sub?.result || null);
 				setPublicationTrends(trends?.result || []);
 
 			}
@@ -142,43 +151,139 @@ export default function Dashboard() {
 							<div className="panel-title-row">
 								<h3>Followed Topics</h3>
 							</div>
+
 							<div className="topics-tags">
-								{topJournals.map((journal) => (
+
+								{followTopics.length === 0 && (
+									<div className="empty-panel">
+										No followed topics.
+									</div>
+								)}
+
+								{followTopics.map((topic) => (
 									<button
-										key={journal.journalName}
+										key={topic.topicId}
 										className="topic-tag"
 									>
-										{journal.journalName}
-
-										<span className="topic-count">
-											{journal.paperCount}
-										</span>
+										{topic.topicName}
 									</button>
 								))}
+
 							</div>
+
 						</div>
 
 						<div className="panel">
-							<h3>Search History</h3>
+
+							<h3>Followed Authors</h3>
+
 							<div className="history-items">
-								{topKeywords.map((keyword) => (
+
+								{followAuthors.length === 0 && (
+									<div className="empty-panel">
+										No followed authors.
+									</div>
+								)}
+
+								{followAuthors.map((author) => (
+
 									<div
-										key={keyword.keywordName}
+										key={author.authorId}
 										className="history-item"
 									>
-										<span>🏷</span>
+
+										<span>👤</span>
 
 										<span className="history-name">
-											{keyword.keywordName}
+											{author.fullName}
 										</span>
 
-										<span className="history-count">
-											{keyword.paperCount}
-										</span>
 									</div>
+
 								))}
+
 							</div>
+
 						</div>
+						<div className="panel">
+
+							<h3>Followed Journals</h3>
+
+							<div className="history-items">
+
+								{followJournals.length === 0 && (
+									<div className="empty-panel">
+										No followed journals.
+									</div>
+								)}
+
+								{followJournals.map((journal) => (
+
+									<div
+										key={journal.journalId}
+										className="history-item"
+									>
+
+										<span>📚</span>
+
+										<span className="history-name">
+											{journal.name}
+										</span>
+
+									</div>
+
+								))}
+
+							</div>
+
+						</div>
+
+						{/* <div className="panel">
+
+							<h3>Premium</h3>
+
+							{subscription?.premium ? (
+
+								<div className="premium-info">
+
+									<div className="premium-badge">
+										PREMIUM
+									</div>
+
+									<div>
+										{subscription.packageName}
+									</div>
+
+									<div>
+										Expires:
+									</div>
+
+									<div>
+										{new Date(subscription.endDate).toLocaleDateString()}
+									</div>
+
+								</div>
+
+							) : (
+
+								<div className="premium-info">
+
+									<p>
+										Upgrade your account to unlock Premium features.
+									</p>
+
+									<button
+										className="premium-btn"
+										onClick={() => navigate("/premium")}
+									>
+										Upgrade
+									</button>
+
+								</div>
+
+							)}
+
+						</div> */}
 
 						<div className="panel chart-panel">
 							<h3>Publication This Month</h3>

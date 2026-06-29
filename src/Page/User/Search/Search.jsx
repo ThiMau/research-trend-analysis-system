@@ -15,6 +15,8 @@ export default function SearchPage() {
 
   const [keyword, setKeyword] = useState(initialKeyword);
   const [papers, setPapers] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({
@@ -24,25 +26,26 @@ export default function SearchPage() {
     keyword: "",
     journal: "",
   });
-  const [fields, setFields] = useState([]);
-  const [years, setYears] = useState([]);
-  const [topics, setTopics] = useState([]);
-  const [keywords, setKeywords] = useState([]);
-  const [journals, setJournals] = useState([]);
+
   const handleSearch = useCallback(async (page = 0, size = 10, searchTermParam) => {
     const searchTerm = searchTermParam !== undefined ? searchTermParam : keyword;
     setLoading(true);
     setError("");
+    const result = res.data.result;
 
+    setPapers(result.content);
+    setPage(result.number);
+    setTotalPages(result.totalPages);
     try {
       // Loại bỏ các param rỗng để tránh backend lỗi 500
       const rawParams = {
-        keyword: searchTerm,
-        fieldId: filters.field,
-        year: filters.year,
-        topic: filters.topic,
-        keywordFilter: filters.keyword,
+        fieldId: filters.fieldId,
+        topicId: filters.topicId,
         journal: filters.journal,
+        fromYear: filters.fromYear,
+        toYear: filters.toYear,
+        isOpenAccess: filters.isOpenAccess,
+        keyword: searchTerm,
         page,
         size,
         sortBy: "createdAt",
@@ -68,32 +71,7 @@ export default function SearchPage() {
     }
   }, [keyword, filters]);
 
-  const loadFilters = async () => {
-    try {
-      const [
-        fieldsRes,
-        yearsRes,
-        topicsRes,
-        keywordsRes,
-        journalsRes,
-      ] = await Promise.all([
-        axiosClient.get("/api/member/fields"),
-        axiosClient.get("/api/member/papers/filters/years"),
-        axiosClient.get("/api/member/papers/filters/topics"),
-        axiosClient.get("/api/member/papers/filters/keywords"),
-        axiosClient.get("/api/member/papers/filters/journals"),
-      ]);
-      setFields(fieldsRes.data.result || []);
-      setYears(yearsRes.data.result || []);
-      setTopics(topicsRes.data.result || []);
-      setKeywords(keywordsRes.data.result || []);
-      setJournals(journalsRes.data.result || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
-  const [filtersLoaded, setFiltersLoaded] = useState(false);
 
   // Search khi mở trang lần đầu
   useEffect(() => {
@@ -162,11 +140,18 @@ export default function SearchPage() {
           })}
       </div>
 
-      <div className="load-more">
-        <button onClick={() => handleSearch()}>
-          Load / Refresh Results
-          <ChevronDown size={16} />
+      <div className="pagination">
+
+        <button disabled={page === 0}>
+          Previous
         </button>
+
+        1 2 3 4 5 ...
+
+        <button disabled={page === totalPages - 1}>
+          Next
+        </button>
+
       </div>
     </div>
   );

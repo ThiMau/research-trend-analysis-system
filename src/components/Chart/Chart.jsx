@@ -5,8 +5,14 @@ export default function Chart({
     topKeywords = [],
     topJournals = []
 }) {
+    // Số năm tối đa hiển thị trên biểu đồ
+    const MAX_PUBLICATION_YEARS = 20;
+
+    // Lấy 20 năm gần nhất
+    const displayPublicationTrend = publicationTrend.slice(-MAX_PUBLICATION_YEARS);
+
     const maxPublication = Math.max(
-        ...publicationTrend.map(i => i.count),
+        ...displayPublicationTrend.map(i => i.count),
         1
     );
 
@@ -25,12 +31,19 @@ export default function Chart({
             {/* ================= Publication Trend ================= */}
             <div className="chart-card">
                 <h2>Publication Growth Over Time</h2>
+
                 <div className="publication-chart">
-                    {publicationTrend.map(item => (
-                        <div key={item.year} className="publication-column">
+                    {displayPublicationTrend.map(item => (
+                        <div
+                            key={item.year}
+                            className="publication-column"
+                            title={`${item.year}: ${item.count} Publications`}
+                        >
                             <div
                                 className="publication-bar"
-                                style={{ height: `${(item.count / maxPublication) * 260}px` }}
+                                style={{
+                                    height: `${(item.count / maxPublication) * 260}px`
+                                }}
                             />
                             <span>{item.year}</span>
                         </div>
@@ -41,15 +54,22 @@ export default function Chart({
             {/* ================= Top Keywords ================= */}
             <div className="chart-card">
                 <h2>Top Keywords</h2>
+
                 {topKeywords.map(item => (
                     <div key={item.keywordName} className="horizontal-row">
-                        <div className="label">{item.keywordName}</div>
+                        <div className="label">
+                            {item.keywordName}
+                        </div>
+
                         <div className="progress">
                             <div
                                 className="progress-fill"
-                                style={{ width: `${(item.paperCount / maxKeyword) * 100}%` }}
+                                style={{
+                                    width: `${(item.paperCount / maxKeyword) * 100}%`
+                                }}
                             />
                         </div>
+
                         <span>{item.paperCount}</span>
                     </div>
                 ))}
@@ -58,15 +78,22 @@ export default function Chart({
             {/* ================= Top Journals ================= */}
             <div className="chart-card">
                 <h2>Top Publishing Journals</h2>
+
                 {topJournals.map(item => (
                     <div key={item.journalName} className="horizontal-row">
-                        <div className="label">{item.journalName}</div>
+                        <div className="label">
+                            {item.journalName}
+                        </div>
+
                         <div className="progress">
                             <div
                                 className="progress-fill"
-                                style={{ width: `${(item.paperCount / maxJournal) * 100}%` }}
+                                style={{
+                                    width: `${(item.paperCount / maxJournal) * 100}%`
+                                }}
                             />
                         </div>
+
                         <span>{item.paperCount}</span>
                     </div>
                 ))}

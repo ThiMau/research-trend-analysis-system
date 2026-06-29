@@ -93,7 +93,7 @@ export default function Filter({ onChange }) {
             >
                 <option value="">All Keywords</option>
                 {keywords.map(item => (
-                    <option key={item.value} value={item.label}>
+                    <option key={item.value} value={item.value}>
                         {item.label}
                     </option>
                 ))}
@@ -106,7 +106,7 @@ export default function Filter({ onChange }) {
             >
                 <option value="">All Journals</option>
                 {journals.map(item => (
-                    <option key={item.value} value={item.label}>
+                    <option key={item.value} value={item.value}>
                         {item.label}
                     </option>
                 ))}
