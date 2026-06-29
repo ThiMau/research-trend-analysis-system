@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import userService from "../../../Services/userService";
 import "./PaperDetail.css";
 import SaveToFolder from "../../../components/Folder/SaveToFolder";
+import bookmarkService from "../../../Services/bookmarkService";
 
 const PaperDetail = () => {
   const { paperId } = useParams();
@@ -12,7 +13,7 @@ const PaperDetail = () => {
   const [journalDetail, setJournalDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [allTopics, setAllTopics] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   const returnTo = location.state?.returnTo || '/search';
@@ -30,6 +31,26 @@ const PaperDetail = () => {
     loadFolders();
   }, []);
 
+  useEffect(() => {
+    fetchTopics();
+  }, []);
+
+  const fetchTopics = async () => {
+    try {
+
+      const res = await userService.getTopics({
+        page: 0,
+        size: 1000
+      });
+
+      setAllTopics(
+        res.result.content || []
+      );
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const fetchPaper = async () => {
     try {
       const res = await userService.getPaperDetail(paperId);
@@ -44,7 +65,7 @@ const PaperDetail = () => {
   };
   const loadFolders = async () => {
     try {
-      const res = await userService.getFolders();
+      const res = await bookmarkService.getFolders();
 
       const list = res.data.result || [];
 
@@ -62,7 +83,7 @@ const PaperDetail = () => {
 
     try {
 
-      await userService.addPaperToFolder(
+      await bookmarkService.addPaperToFolder(
         selectedFolder,
         paper.paperId,
         note
@@ -145,14 +166,51 @@ const PaperDetail = () => {
         <p className="abstract">{paper.paperAbstract}</p>
 
         <div className="metadata">
+
           <h3>Keywords</h3>
 
           <div className="keyword-list">
             {paper.keywords?.map((keyword, index) => (
-              <span key={index}>{keyword}</span>
+              <span key={index}>
+                {keyword}
+              </span>
             ))}
           </div>
+
+          <h3 className="topic-title">
+            Topics
+          </h3>
+
+          <div className="topic-list">
+
+            {paper.topics?.map((topicName) => {
+
+              const topic = allTopics.find(
+                t => t.topicName === topicName
+              );
+
+              return (
+                <span
+                  key={topicName}
+                  className="topic-tag"
+                  onClick={() => {
+
+                    if (topic) {
+                      navigate(`/topics/${topic.topicId}`);
+                    }
+
+                  }}
+                >
+                  {topicName}
+                </span>
+              );
+
+            })}
+
+          </div>
+
         </div>
+
       </div>
 
       <div className="paper-sidebar">
@@ -190,8 +248,13 @@ const PaperDetail = () => {
           <p>
             <strong>Citations:</strong> {paper.citationCount ?? "N/A"}
           </p>
-
-          <Link to={`/journals/${paper.journalId}`}>View Journal</Link>
+          {paper.journalId && (
+            <Link
+              to={`/journals/${paper.journalId}`}
+            >
+              View Journal
+            </Link>
+          )}
         </div>
       </div>
       {showFolder && (

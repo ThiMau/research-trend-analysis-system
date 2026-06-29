@@ -96,6 +96,81 @@ const userService = {
   },
 
   // ======================
+  // FOLLOW
+  // ======================
+
+  getFollowTopics: async () => {
+    const response = await axiosClient.get(
+      "/api/member/follow/topics"
+    );
+    return response.data;
+  },
+
+  getFollowAuthors: async () => {
+    const response = await axiosClient.get(
+      "/api/member/follow/authors"
+    );
+    return response.data;
+  },
+
+  getFollowJournals: async () => {
+    const response = await axiosClient.get(
+      "/api/member/follow/journals"
+    );
+    return response.data;
+  },
+
+  followTopic: async (topicId) => {
+    const response = await axiosClient.post(
+      "/api/member/follow/topics",
+      {
+        topicId,
+      }
+    );
+    return response.data;
+  },
+
+  unfollowTopic: async (topicId) => {
+    const response = await axiosClient.delete(
+      `/api/member/follow/topics/${topicId}`
+    );
+    return response.data;
+  },
+
+  followAuthor: async (authorId) => {
+    const response = await axiosClient.post(
+      "/api/member/follow/authors",
+      {
+        authorId,
+      }
+    );
+    return response.data;
+  },
+
+  unfollowAuthor: async (authorId) => {
+    const response = await axiosClient.delete(
+      `/api/member/follow/authors/${authorId}`
+    );
+    return response.data;
+  },
+
+  followJournal: async (journalId) => {
+    const response = await axiosClient.post(
+      "/api/member/follow/journals",
+      {
+        journalId,
+      }
+    );
+    return response.data;
+  },
+
+  unfollowJournal: async (journalId) => {
+    const response = await axiosClient.delete(
+      `/api/member/follow/journals/${journalId}`
+    );
+    return response.data;
+  },
+  // ======================
   // TREND ANALYTICS
   // ======================
 

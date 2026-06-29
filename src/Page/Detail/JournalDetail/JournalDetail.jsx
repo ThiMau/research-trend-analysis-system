@@ -30,66 +30,66 @@ const JournalDetail = () => {
       setPapers(papersData);
       try {
 
-    const followRes =
-        await userService.getFollowJournals();
+        const followRes =
+          await userService.getFollowJournals();
 
-    const followed =
-        followRes.data?.result ||
-        followRes.result ||
-        [];
+        const followed =
+          followRes.data?.result ||
+          followRes.result ||
+          [];
 
-    setIsFollowed(
+        setIsFollowed(
 
-        followed.some(
+          followed.some(
             (item) =>
-                item.journalId ===
-                Number(journalId)
-        )
+              item.journalId ===
+              Number(journalId)
+          )
 
-    );
+        );
 
-} catch {
-console.error(err);
-}
+      } catch (err) {
+        console.error(err);
+      }
 
     } catch (err) {
       console.error(err);
       setError(
         err.response?.data?.message ||
-          "Unable to load journal details. Please try again."
+        "Unable to load journal details. Please try again."
       );
     } finally {
       setLoading(false);
     }
   };
 
-const handleFollow = async () => {
+  const handleFollow = async () => {
 
     try {
 
-        if (isFollowed) {
+      if (isFollowed) {
 
-            await userService.unfollowJournal(
-                journalId
-            );
+        await userService.unfollowJournal(
+          journalId
+        );
 
-        } else {
+      } else {
 
-            await userService.followJournal(
-                journalId
-            );
+        await userService.followJournal(
+          journalId
+        );
 
-        }
+      }
 
-        setIsFollowed(!isFollowed);
+      setIsFollowed(!isFollowed);
 
     } catch (err) {
 
-        console.log(err);
+      console.log(err);
 
     }
 
-};
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -111,36 +111,36 @@ const handleFollow = async () => {
 
   return (
     <div className="journal-page">
-      <div className="journal-header">
-        <button
-          className="back-button"
-          onClick={() => navigate(-1)}
-        >
+      <div className="header-top">
+
+        <button className="back-button">
+
           ← Back
+
         </button>
 
-      <button
-        className={
+        <button
+          className={
             isFollowed
-                ? "follow-btn followed"
-                : "follow-btn"
-        }
-        onClick={handleFollow}
-      >
-        {isFollowed
+              ? "follow-btn followed"
+              : "follow-btn"
+          }
+          onClick={handleFollow}
+        >
+          {isFollowed
             ? "Unfollow"
             : "Follow Journal"}
-
         </button>
 
-        <h1>{journal.name || journal.title}</h1>
-
-        <div className="journal-meta">
-          <span>ISSN: {journal.issn || "N/A"}</span>
-          <span>Publisher: {journal.publisher || "N/A"}</span>
-          <span>Status: {journal.status || "N/A"}</span>
-        </div>
       </div>
+      <h1>{journal.name || journal.title}</h1>
+
+      <div className="journal-meta">
+        <span>ISSN: {journal.issn || "N/A"}</span>
+        <span>Publisher: {journal.publisher || "N/A"}</span>
+        <span>Status: {journal.status || "N/A"}</span>
+      </div>
+
 
       <div className="journal-stats">
         <div className="stat-card">
