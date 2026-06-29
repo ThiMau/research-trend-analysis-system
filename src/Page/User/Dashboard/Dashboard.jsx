@@ -2,7 +2,7 @@ import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userService from '../../../Services/userService';
-
+import Chart from '../../../components/Chart/Chart';
 
 function StatCard({ label, value }) {
 	return (
@@ -70,56 +70,26 @@ export default function Dashboard() {
 
 				const [
 					me,
-					papers,
-					follows,
 					keywords,
 					journals,
 					trends
 				] = await Promise.all([
 					userService.getMe(),
-					userService.getPapers({
-						page: 0,
-						size: 10,
-					}),
-
-					userService.getFollowTopics(),
 					userService.getTopKeywords(),
 					userService.getTopJournals(),
-					userService.getPublicationTrends()
+					userService.getPublicationTrend()
 				]);
-				setTopKeywords(
-					keywords.result || []
-				);
-				setTopJournals(
-					journals.result || []
-				);
-				const trend = await userService.getPublicationTrends({
-					fromYear: year,
-					toYear: year
-				});
 
-				const result = trend.result || [];
-
-				if (result.length >= 2) {
-
-					const current = result[result.length - 1].count;
-
-					const previous = result[result.length - 2].count;
-
-					const percent =
-						previous === 0
-							? 100
-							: ((current - previous) / previous * 100);
-
-					setPublicationTrends(
-						trends.result || []
-					);
-				}
+				setUser(me?.result || null);
+				setTopKeywords(keywords?.result || []);
+				setTopJournals(journals?.result || []);
+				setPublicationTrends(trends?.result || []);
 
 			}
 			catch (err) {
 
 				console.error(err);
+				setError("Failed to load dashboard data.");
 
 			}
 			finally {
@@ -173,7 +143,7 @@ export default function Dashboard() {
 								<h3>Followed Topics</h3>
 							</div>
 							<div className="topics-tags">
-								{topicsList.map((journal) => (
+								{topJournals.map((journal) => (
 									<button
 										key={journal.journalName}
 										className="topic-tag"

@@ -1,121 +1,184 @@
 import "./MyLibrary.css";
-import {useState} from "react";
+import { useState } from "react";
 import Folder from "../../../components/Folder/Folder";
 
-export default function MyLibrary(){
+export default function MyLibrary() {
 
-const [papers,setPapers]=useState([]);
-const [selectedFolder,setSelectedFolder]=useState(null);
+    const [papers, setPapers] = useState([]);
+    const [selectedFolder, setSelectedFolder] = useState(null);
 
-const handleFolderChange=(folder,paperList)=>{
-setSelectedFolder(folder);
-setPapers(paperList);
-};
+    const handleFolderChange = (folder, paperList) => {
+        setSelectedFolder(folder);
+        setPapers(paperList);
+    };
 
-return(
-<div className="library-page">
 
-<div className="library-top">
-<input
-type="text"
-placeholder="Search in current folder..."
-className="library-search"
-/>
-</div>
+    return (
+        <div className="library-page">
 
-<div className="library-content">
+            <div className="library-content">
 
-<Folder
-onFolderChange={handleFolderChange}
-/>
 
-<div className="library-main">
+                <Folder
+                    onFolderChange={handleFolderChange}
+                />
 
-<div className="library-header">
 
-<div>
-<h2>{selectedFolder?.folderName||"My Library"}</h2>
-<p>{papers.length} saved papers</p>
-</div>
+                <div className="library-main">
 
-</div>
 
-<table className="library-table">
+                    <div className="library-header">
 
-<thead>
+                        <h2>
+                            {selectedFolder?.folderName || "My Library"}
+                        </h2>
 
-<tr>
-<th>TITLE & ABSTRACT</th>
-<th>METADATA</th>
-<th>NOTE</th>
-<th>ACTIONS</th>
-</tr>
+                        <p>
+                            {papers.length} saved papers
+                        </p>
 
-</thead>
+                    </div>
 
-<tbody>
 
-{papers.length===0?(
-<tr>
-<td colSpan="4" style={{textAlign:"center",padding:"40px"}}>
-No papers in this folder.
-</td>
-</tr>
-):(
+                    <table className="library-table">
 
-papers.map((paper)=>(
+                        <thead>
 
-<tr key={paper.bookmarkId}>
+                            <tr>
 
-<td>
-<h4>{paper.title}</h4>
-<p>{paper.paperAbstract?.slice(0,120)}...</p>
-</td>
+                                <th>
+                                    TITLE & ABSTRACT
+                                </th>
 
-<td>
-<div className="meta">
-<span>{paper.authors?.[0]?.fullName}</span>
-<span>{paper.publicationYear}</span>
-<span>{paper.journalName}</span>
-</div>
-</td>
+                                <th>
+                                    METADATA
+                                </th>
 
-<td>
-{paper.note||"-"}
-</td>
+                                <th>
+                                    NOTE
+                                </th>
 
-<td>
+                                <th>
+                                    ACTIONS
+                                </th>
 
-<button
-className="action-btn"
->
-Edit Note
-</button>
+                            </tr>
 
-<button
-className="action-btn"
-style={{marginLeft:8}}
->
-Remove
-</button>
+                        </thead>
 
-</td>
 
-</tr>
+                        <tbody>
 
-))
 
-)}
+                            {
+                                papers.length === 0 ?
 
-</tbody>
+                                    <tr>
 
-</table>
+                                        <td
+                                            colSpan="4"
+                                            className="library-empty"
+                                        >
 
-</div>
+                                            No papers in this folder.
 
-</div>
+                                        </td>
 
-</div>
-);
+                                    </tr>
+
+
+                                    :
+
+                                    papers.map(paper => (
+
+                                        <tr key={paper.bookmarkId}>
+
+
+                                            <td>
+
+                                                <h4>
+                                                    {paper.title}
+                                                </h4>
+
+                                                <p>
+                                                    {paper.paperAbstract?.slice(0, 120)}
+                                                    ...
+                                                </p>
+
+                                            </td>
+
+
+
+                                            <td>
+
+                                                <div className="library-meta">
+
+                                                    <span>
+                                                        {paper.authors?.[0]?.fullName || "Unknown"}
+                                                    </span>
+
+                                                    <span>
+                                                        {paper.publicationYear}
+                                                    </span>
+
+                                                    <span>
+                                                        {paper.journalName}
+                                                    </span>
+
+                                                </div>
+
+                                            </td>
+
+
+
+                                            <td>
+
+                                                {paper.note || "-"}
+
+                                            </td>
+
+
+
+                                            <td>
+
+                                                <button
+                                                    className="library-edit-btn"
+                                                >
+                                                    Edit Note
+                                                </button>
+
+
+                                                <button
+                                                    className="library-remove-btn"
+                                                >
+                                                    Remove
+                                                </button>
+
+
+                                            </td>
+
+
+                                        </tr>
+
+
+                                    ))
+
+                            }
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+    )
 
 }

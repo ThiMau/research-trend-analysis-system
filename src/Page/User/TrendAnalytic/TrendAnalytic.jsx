@@ -37,9 +37,9 @@ export default function TrendAnalytic() {
         userService.getTopJournals(filterData.fieldId),
       ]);
 
-      setPublicationTrend(trendRes.data.result || []);
-      setTopKeywords(keywordRes.data.result || []);
-      setTopJournals(journalRes.data.result || []);
+      setPublicationTrend(trendRes.result || []);
+      setTopKeywords(keywordRes.result || []);
+      setTopJournals(journalRes.result || []);
     } catch (err) {
       console.log(err);
       setError("Unable to load chart data.");

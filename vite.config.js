@@ -17,8 +17,23 @@ export default defineConfig({
       '/users': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+      },
+      '/bookmarks': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/follow': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/premiums': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/invoices': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
       }
-      
     }
   }
 })

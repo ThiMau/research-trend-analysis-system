@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import userService from "../../../Services/userService";
 import "./PaperDetail.css";
-import Folder from "../../../components/Folder/Folder";
+import SaveToFolder from "../../../components/Folder/SaveToFolder";
 
 const PaperDetail = () => {
   const { paperId } = useParams();
 
+  const [paper, setPaper] = useState(null);
   const [showFolder, setShowFolder] = useState(false);
-  const [note, setNote] = useState("");
   const [journalDetail, setJournalDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -70,7 +70,7 @@ const PaperDetail = () => {
 
       alert("Saved successfully.");
 
-      setShowSaveDialog(false);
+      setShowFolder(false);
 
     } catch (err) {
 
@@ -195,14 +195,14 @@ const PaperDetail = () => {
         </div>
       </div>
       {showFolder && (
-        <Folder
+        <SaveToFolder
           paperId={paper.paperId}
-          note={note}
-          setNote={setNote}
-          showSaveDialog={showFolder}
-          setShowSaveDialog={setShowFolder}
+          close={() =>
+            setShowFolder(false)
+          }
         />
-      )}
+      )
+      }
     </div>
   );
 };

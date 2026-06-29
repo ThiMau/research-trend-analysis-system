@@ -1,13 +1,7 @@
-import { Search, Gift, Bell, User } from "lucide-react";
+import { Search, Crown, Bell, User } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SearchBar.css";
-import {
-  Search,
-  Crown,
-  Bell,
-  User
-} from "lucide-react";
 
 export default function SearchBar({ showInput = true }) {
   const [darkMode, setDarkMode] = useState(false);

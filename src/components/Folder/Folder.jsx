@@ -1,164 +1,148 @@
-import {useEffect,useState} from "react";
-import {useLocation,useNavigate} from "react-router-dom";
-import userService from "../../Services/userService";
+import { useEffect, useState } from "react";
+import bookmarkService from "../../Services/bookmarkService";
+import CreateFolder from "./CreateFolder";
+import FolderMenu from "./FolderMenu";
 import "./Folder.css";
 
-export default function Folder({onFolderChange}){
+export default function Folder({ onFolderChange }) {
 
-const navigate=useNavigate();
-const location=useLocation();
+    const [folders, setFolders] = useState([]);
+    const [selectedFolder, setSelectedFolder] = useState(null);
+    const [showCreate, setShowCreate] = useState(false);
+    const [menuFolder, setMenuFolder] = useState(null);
 
-const pendingPaperId=location.state?.pendingPaperId;
-const pendingNote=location.state?.pendingNote||"";
+    useEffect(() => {
+        loadFolders();
+    }, []);
 
-const [folders,setFolders]=useState([]);
-const [selectedFolder,setSelectedFolder]=useState(null);
+    const loadFolders = async () => {
+        try {
+            const res = await bookmarkService.getFolders();
+            const list = res.data.result || [];
 
-useEffect(()=>{
-loadFolders();
-},[]);
+            setFolders(list);
 
-useEffect(()=>{
-if(selectedFolder){
-loadPapers(selectedFolder);
-}
-},[selectedFolder]);
+            if (list.length > 0) {
+                setSelectedFolder(list[0]);
+                loadPapers(list[0]);
+            }
 
-const loadFolders=async()=>{
-try{
-const res=await userService.getFolders();
-const list=res.data.result||[];
-setFolders(list);
-if(list.length>0){
-setSelectedFolder(list[0]);
-}
-}catch(err){
-console.log(err);
-}
-};
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
-const loadPapers=async(folder)=>{
-try{
-const res=await userService.getFolderPapers(folder.folderId);
-const papers=res.data.result||[];
-onFolderChange(folder,papers);
-if(pendingPaperId){
-await savePendingPaper(folder.folderId);
-}
-}catch(err){
-console.log(err);
-}
-};
 
-const createFolder=async()=>{
-const folderName=prompt("Folder name");
-if(!folderName)return;
-try{
-await userService.createFolder(folderName);
-await loadFolders();
-}catch(err){
-console.log(err);
-}
-};
+    const loadPapers = async (folder) => {
+        try {
 
-const renameFolder=async()=>{
-if(!selectedFolder)return;
-const folderName=prompt("Folder name",selectedFolder.folderName);
-if(!folderName)return;
-try{
-await userService.updateFolder(selectedFolder.folderId,folderName);
-await loadFolders();
-}catch(err){
-console.log(err);
-}
-};
+            const res =
+                await bookmarkService.getFolderPapers(folder.folderId);
 
-const deleteFolder=async()=>{
-if(!selectedFolder)return;
-if(!window.confirm("Delete folder?"))return;
-try{
-await userService.deleteFolder(selectedFolder.folderId);
-await loadFolders();
-}catch(err){
-console.log(err);
-}
-};
+            onFolderChange(
+                folder,
+                res.data.result || []
+            );
 
-const savePendingPaper=async(folderId)=>{
-try{
-await userService.addPaperToFolder(folderId,pendingPaperId,pendingNote);
-navigate("/my-library",{replace:true});
-}catch(err){
-console.log(err);
-}
-};
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
-return(
-<div className="library-sidebar">
 
-<h4>COLLECTIONS</h4>
+    const afterCreate = (folder) => {
+        setFolders(prev => [
+            ...prev,
+            folder
+        ]);
 
-<button
-className="new-folder-btn"
-onClick={createFolder}
->
-+ New Folder
-</button>
+        setSelectedFolder(folder);
+        setShowCreate(false);
+    };
 
-<div className="folder-toolbar">
 
-<button
-className="folder-btn secondary"
-onClick={renameFolder}
-disabled={!selectedFolder}
->
-Rename
-</button>
+    return (
+        <div className="folder-sidebar-wrapper">
 
-<button
-className="folder-btn secondary"
-onClick={deleteFolder}
-disabled={!selectedFolder}
->
-Delete
-</button>
+            <h4 className="folder-title">
+                COLLECTIONS
+            </h4>
 
-</div>
+            <button
+                className="folder-create-button"
+                onClick={() => setShowCreate(true)}
+            >
+                + New Folder
+            </button>
 
-<div className="folder-sidebar">
 
-{folders.length===0&&(
-<div className="folder-empty">
-No Folder
-</div>
-)}
+            <div className="folder-list">
 
-{folders.map(folder=>(
+                {
+                    folders.length === 0 ?
 
-<div
-key={folder.folderId}
-className={`folder-item ${
-selectedFolder?.folderId===folder.folderId
-?"active":""
-}`}
-onClick={()=>setSelectedFolder(folder)}
->
+                        <div className="folder-empty-text">
+                            No Folder
+                        </div>
 
-<span>
-{folder.folderName}
-</span>
+                        :
 
-<span className="folder-count">
-{folder.totalPapers??0}
-</span>
+                        folders.map(folder => (
 
-</div>
+                            <div
+                                key={folder.folderId}
+                                className={
+                                    selectedFolder?.folderId === folder.folderId ? "folder-row active" : "folder-row"
+                                }
+                            >
 
-))}
+                                <div
+                                    className="folder-name-area"
+                                    onClick={() => {
+                                        setSelectedFolder(folder);
+                                        loadPapers(folder);
+                                    }}
+                                >
+                                    <span>
+                                        {folder.folderName}
+                                    </span>
 
-</div>
+                                    <span className="folder-total">
+                                        {folder.totalPapers ?? 0}
+                                    </span>
+                                </div>
 
-</div>
-);
+                                <button
+                                    className="folder-menu-button"
+                                    onClick={() =>
+                                        setMenuFolder(
+                                            menuFolder?.folderId === folder.folderId ? null : folder
+                                        )
+                                    }
+                                >
+                                    ...
+                                </button>
+
+                                {
+                                    menuFolder?.folderId === folder.folderId &&
+                                    <FolderMenu
+                                        folder={folder}
+                                        reload={loadFolders}
+                                    />
+                                }
+                            </div>
+                        ))
+                }
+            </div>
+
+            {
+                showCreate &&
+                <CreateFolder
+                    close={() => setShowCreate(false)}
+                    onCreated={afterCreate}
+                />
+            }
+        </div>
+    )
 
 }

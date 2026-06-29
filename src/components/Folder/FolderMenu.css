@@ -1,0 +1,27 @@
+.folder-dropdown {
+    position: absolute;
+    right: 5px;
+    top: 35px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px;
+    z-index: 20;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .1);
+}
+
+
+.folder-dropdown button {
+    display: block;
+    width: 100%;
+    border: none;
+    background: white;
+    padding: 8px 20px;
+    cursor: pointer;
+    text-align: left;
+}
+
+
+.folder-dropdown button:hover {
+    background: #f1f5f9;
+}

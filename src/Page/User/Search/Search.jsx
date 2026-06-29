@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import Filter from "../../../components/Filter/Filter";
 import "./Search.css";
@@ -24,27 +24,38 @@ export default function SearchPage() {
     keyword: "",
     journal: "",
   });
+  const [fields, setFields] = useState([]);
+  const [years, setYears] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [keywords, setKeywords] = useState([]);
+  const [journals, setJournals] = useState([]);
   const handleSearch = useCallback(async (page = 0, size = 10, searchTermParam) => {
     const searchTerm = searchTermParam !== undefined ? searchTermParam : keyword;
     setLoading(true);
     setError("");
 
     try {
-      const res = await axiosClient.get("/api/member/papers", {
-        params: {
-          keyword: searchTerm,
-          fieldId: filters.field,
-          year: filters.year,
-          topic: filters.topic,
-          keywordFilter: filters.keyword,
-          journal: filters.journal,
+      // Loại bỏ các param rỗng để tránh backend lỗi 500
+      const rawParams = {
+        keyword: searchTerm,
+        fieldId: filters.field,
+        year: filters.year,
+        topic: filters.topic,
+        keywordFilter: filters.keyword,
+        journal: filters.journal,
+        page,
+        size,
+        sortBy: "createdAt",
+        direction: "desc",
+      };
 
-          page,
-          size,
-          sortBy: "createdAt",
-          direction: "desc",
-        },
-      });
+      const params = Object.fromEntries(
+        Object.entries(rawParams).filter(
+          ([, v]) => v !== "" && v !== null && v !== undefined
+        )
+      );
+
+      const res = await axiosClient.get("/api/member/papers", { params });
 
       const result = res.data?.result;
       const list = result?.content || [];
@@ -55,7 +66,7 @@ export default function SearchPage() {
     } finally {
       setLoading(false);
     }
-  }, [keyword]);
+  }, [keyword, filters]);
 
   const loadFilters = async () => {
     try {
@@ -84,16 +95,19 @@ export default function SearchPage() {
 
   const [filtersLoaded, setFiltersLoaded] = useState(false);
 
-  // Search khi mở trang bằng keyword
+  // Search khi mở trang lần đầu
   useEffect(() => {
-    if (initialKeyword) {
-      (async () => {
-        await handleSearch(0, 10, initialKeyword);
-      })();
-    }
-  }, [initialKeyword, handleSearch]);
+    handleSearch(0, 10, initialKeyword);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // Search lại khi filter thay đổi (bỏ qua lần render đầu)
+  const isFirstRender = React.useRef(true);
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     handleSearch();
   }, [filters]);
 
