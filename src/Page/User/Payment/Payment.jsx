@@ -9,8 +9,9 @@ export default function Payment() {
   const location = useLocation();
 
   const invoice = location.state?.invoice;
+  const initialPayment = location.state?.payment;
 
-  const [payment, setPayment] = useState(null);
+  const [payment, setPayment] = useState(initialPayment ?? null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +20,14 @@ export default function Payment() {
       return;
     }
 
+    if (initialPayment) {
+      setPayment(initialPayment);
+      setLoading(false);
+      return;
+    }
+
     createPayment();
-  }, []);
+  }, [invoice, initialPayment, navigate]);
 
   const createPayment = async () => {
     try {
