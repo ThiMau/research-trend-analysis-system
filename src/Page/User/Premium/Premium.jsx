@@ -50,20 +50,29 @@ export default function Premium() {
     try {
       setLoading(true);
 
-      const response = await paymentService.createInvoice(
+      const invoiceResponse = await paymentService.createInvoice(
         selectedPackage.premiumId
       );
 
-      if (response.code === 1000 || response.code === 0) {
-        navigate("/payment", {
-          state: {
-            invoice: response.result,
-          },
-        });
+      if (invoiceResponse.code === 1000 || invoiceResponse.code === 0) {
+        const paymentResponse = await paymentService.createPayment(
+          invoiceResponse.result.invoiceId
+        );
+
+        if (paymentResponse.code === 1000 || paymentResponse.code === 0) {
+          navigate("/payment", {
+            state: {
+              invoice: invoiceResponse.result,
+              payment: paymentResponse.result,
+            },
+          });
+        } else {
+          alert("Cannot create payment.");
+        }
       }
     } catch (error) {
       console.error(error);
-      alert("Cannot create invoice.");
+      alert("Cannot create invoice or payment.");
     } finally {
       setLoading(false);
     }

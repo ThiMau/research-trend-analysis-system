@@ -5,6 +5,9 @@ import paymentService from "../../../Services/paymentService";
 import premiumService from "../../../Services/premiumService";
 import "./Payment.css";
 
+const MAX_RETRIES = 6;
+const RETRY_DELAY_MS = 2000;
+
 export default function PaymentSuccess() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,31 +15,86 @@ export default function PaymentSuccess() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
     const params = new URLSearchParams(location.search);
     const orderCode = params.get("orderCode");
+    const invoiceId = params.get("invoiceId");
 
-    if (orderCode) {
-      paymentService.confirmPayment(orderCode)
-        .then(() => {
-          // Verify that the subscription is now successfully saved in DB
-          return premiumService.getCurrentSubscription();
-        })
-        .then((res) => {
-          if (res.code === 1000 || res.code === 0) {
-            setVerifying(false);
-          } else {
-            setError("Payment was confirmed, but failed to retrieve subscription data.");
-            setVerifying(false);
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to verify payment status:", err);
-          setError("Failed to update subscription. Please ensure the backend server has been restarted to load the new config.");
+    const verifyPayment = async () => {
+      if (!orderCode && !invoiceId) {
+        if (isMounted) {
           setVerifying(false);
-        });
-    } else {
-      setVerifying(false);
-    }
+        }
+        return;
+      }
+
+      try {
+        if (isMounted) {
+          setError(null);
+          setVerifying(true);
+        }
+
+        await paymentService.confirmPayment(orderCode ?? invoiceId);
+
+        let verified = false;
+
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
+          try {
+            const subscriptionResponse = await premiumService.getCurrentSubscription();
+            const paymentHistoryResponse = await paymentService.getPaymentHistory();
+
+            const hasActiveSubscription =
+              subscriptionResponse?.code === 1000 || subscriptionResponse?.code === 0;
+            const hasSuccessfulPayment = Array.isArray(paymentHistoryResponse?.result)
+              ? paymentHistoryResponse.result.some((item) => {
+                  const status = String(item?.transactionStatus || item?.status || "").toUpperCase();
+                  return status === "PAID" || status === "SUCCESS" || status === "COMPLETED";
+                })
+              : false;
+
+            if (hasActiveSubscription || hasSuccessfulPayment) {
+              verified = true;
+              break;
+            }
+          } catch (refreshError) {
+            console.warn(`Payment verification attempt ${attempt} failed:`, refreshError);
+          }
+
+          if (!isMounted) {
+            return;
+          }
+
+          if (attempt < MAX_RETRIES) {
+            await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+          }
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (verified) {
+          setVerifying(false);
+        } else {
+          setError("Payment was confirmed, but the latest subscription/payment data is still not available yet. Please wait a moment and try again.");
+          setVerifying(false);
+        }
+      } catch (err) {
+        if (!isMounted) {
+          return;
+        }
+
+        console.error("Failed to verify payment status:", err);
+        setError("Failed to update subscription. Please wait a moment and try again.");
+        setVerifying(false);
+      }
+    };
+
+    verifyPayment();
+
+    return () => {
+      isMounted = false;
+    };
   }, [location.search]);
 
   return (
