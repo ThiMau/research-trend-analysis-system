@@ -15,6 +15,21 @@ export default function Folder({ onFolderChange }) {
         loadFolders();
     }, []);
 
+    useEffect(() => {
+        if (!menuFolder) return;
+
+        const handleOutsideClick = (e) => {
+            if (!e.target.closest(".folder-menu-button") && !e.target.closest(".folder-dropdown")) {
+                setMenuFolder(null);
+            }
+        };
+
+        document.addEventListener("click", handleOutsideClick);
+        return () => {
+            document.removeEventListener("click", handleOutsideClick);
+        };
+    }, [menuFolder]);
+
     const loadFolders = async () => {
         try {
             const res = await bookmarkService.getFolders();
@@ -25,6 +40,9 @@ export default function Folder({ onFolderChange }) {
             if (list.length > 0) {
                 setSelectedFolder(list[0]);
                 loadPapers(list[0]);
+            } else {
+                setSelectedFolder(null);
+                onFolderChange(null, []);
             }
 
         } catch (err) {
@@ -50,7 +68,24 @@ export default function Folder({ onFolderChange }) {
     };
 
 
-    const afterCreate = (folder) => {
+    const afterCreate = async (folder) => {
+        if (!folder || !folder.folderId) {
+            try {
+                const res = await bookmarkService.getFolders();
+                const list = res.data.result || [];
+                setFolders(list);
+                if (list.length > 0) {
+                    const newest = list[list.length - 1];
+                    setSelectedFolder(newest);
+                    loadPapers(newest);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+            setShowCreate(false);
+            return;
+        }
+
         setFolders(prev => [
             ...prev,
             folder

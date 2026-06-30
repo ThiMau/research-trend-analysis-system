@@ -50,9 +50,9 @@ const TopicDetail = () => {
 
     );
 
-} catch {
- console.log(err)
-}
+      } catch (err) {
+        console.log(err);
+      }
     } catch (err) {
       console.error(err);
 
@@ -67,25 +67,16 @@ const TopicDetail = () => {
 
   const handleFollow = async () => {
     try {
-
         if (isFollowed) {
-
-            await userService.unfollowTopic(topicId);
-
+            await userService.unfollowTopic(Number(topicId));
         } else {
-
-            await userService.followTopic(topicId);
-
+            await userService.followTopic(Number(topicId));
         }
-
         setIsFollowed(!isFollowed);
-
     } catch (err) {
-
         console.log(err);
-
     }
-};
+  };
 
   if (loading) return <div>Loading...</div>;
 

@@ -6,7 +6,7 @@ export default function Chart({
     topJournals = []
 }) {
     // Số năm tối đa hiển thị trên biểu đồ
-    const MAX_PUBLICATION_YEARS = 20;
+    const MAX_PUBLICATION_YEARS = 18;
 
     // Lấy 20 năm gần nhất
     const displayPublicationTrend = publicationTrend.slice(-MAX_PUBLICATION_YEARS);

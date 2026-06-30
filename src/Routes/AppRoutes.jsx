@@ -14,6 +14,7 @@ import Report from "../Page/User/Report/Report";
 import PaperDetail from "../Page/Detail/PaperDetail/PaperDetail";
 import AuthorDetail from "../Page/Detail/AuthorDetail/AuthorDetail";
 import JournalDetail from "../Page/Detail/JournalDetail/JournalDetail";
+import TopicDetail from "../Page/Detail/TopicDetail/TopicDetail";
 import ResetPassword from "../Page/Authentication/ResetPassword/ResetPassword";
 import Profile from "../Page/User/Profile/Profile";
 import ProtectedRoute from "./ProtectedRoute";
@@ -21,6 +22,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import Sidebar from "../components/Sidebar/Sidebar";
 import SearchBar from "../components/SearchBar/SearchBar";
 import Payment from "../Page/User/Payment/Payment";
+import PaymentSuccess from "../Page/User/Payment/PaymentSuccess";
+import PaymentCancel from "../Page/User/Payment/PaymentCancel";
 import Premium from "../Page/User/Premium/Premium";
 import Subscription from "../Page/User/Subscription/Subscription";
 import PaymentHistory from "../Page/User/PaymentHistory/PaymentHistory";
@@ -154,6 +157,28 @@ function AppRoutes() {
         />
 
         <Route
+          path="/payment/success"
+          element={
+            <ProtectedRoute>
+              <MainLayout showSearchInput={false}>
+                <PaymentSuccess />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/payment/cancel"
+          element={
+            <ProtectedRoute>
+              <MainLayout showSearchInput={false}>
+                <PaymentCancel />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/subscription"
           element={
             <ProtectedRoute>
@@ -205,6 +230,17 @@ function AppRoutes() {
             <ProtectedRoute>
               <MainLayout>
                 <JournalDetail />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/topics/:topicId"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <TopicDetail />
               </MainLayout>
             </ProtectedRoute>
           }

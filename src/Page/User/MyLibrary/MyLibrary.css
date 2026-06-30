@@ -75,14 +75,24 @@
   color: #64748b;
 }
 
+.library-actions-cell {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .library-edit-btn,
 .library-remove-btn {
+  flex: 1;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
-  margin-right: 8px;
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 90px;
 }
 
 .library-edit-btn {

@@ -23,34 +23,26 @@ const PaperDetail = () => {
   }, [paperId]);
 
   useEffect(() => {
-    if (paper?.journalId) {
-      fetchJournal(paper.journalId);
-    }
-  }, [paper?.journalId]);
-  useEffect(() => {
-    loadFolders();
-  }, []);
-
-  useEffect(() => {
     fetchTopics();
   }, []);
 
   const fetchTopics = async () => {
     try {
-
       const res = await userService.getTopics({
         page: 0,
         size: 1000
       });
-
-      setAllTopics(
-        res.result.content || []
-      );
-
+      setAllTopics(res.result?.content || res.result || []);
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    if (paper?.journalId) {
+      fetchJournal(paper.journalId);
+    }
+  }, [paper?.journalId]);
   const fetchPaper = async () => {
     try {
       const res = await userService.getPaperDetail(paperId);
@@ -62,45 +54,6 @@ const PaperDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
-  const loadFolders = async () => {
-    try {
-      const res = await bookmarkService.getFolders();
-
-      const list = res.data.result || [];
-
-      setFolders(list);
-
-      if (list.length > 0) {
-        setSelectedFolder(list[0].folderId);
-      }
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const saveToFolder = async () => {
-
-    try {
-
-      await bookmarkService.addPaperToFolder(
-        selectedFolder,
-        paper.paperId,
-        note
-      );
-
-      alert("Saved successfully.");
-
-      setShowFolder(false);
-
-    } catch (err) {
-
-      console.log(err);
-
-      alert("Cannot save paper.");
-
-    }
-
   };
   const fetchJournal = async (journalId) => {
     try {

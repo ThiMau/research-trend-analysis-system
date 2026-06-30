@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import authService from "../../../Services/authService";
+import userService from "../../../Services/userService";
 import "./Report.css";
 
 export default function ReportPage() {
@@ -51,7 +51,7 @@ export default function ReportPage() {
       // try API but don't rely on it — still update local history
       try {
         if (paper?.paperId) {
-          await authService.createReport({
+          await userService.createReport({
             paperId: paper.paperId,
             reportType,
             description,

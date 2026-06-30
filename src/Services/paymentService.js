@@ -51,6 +51,24 @@ const paymentService = {
       throw error;
     }
   },
+
+  /**
+   * Xác nhận thanh toán qua Webhook (FE gọi trực tiếp hỗ trợ localhost)
+   * POST /api/payment/webhook
+   */
+  async confirmPayment(orderCode) {
+    try {
+      const response = await axiosClient.post("/api/payment/webhook", {
+        data: {
+          orderCode: Number(orderCode),
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Confirm Payment Error:", error);
+      throw error;
+    }
+  },
 };
 
 export default paymentService;

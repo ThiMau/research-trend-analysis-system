@@ -26,7 +26,9 @@ const premiumService = {
       );
       return response.data;
     } catch (error) {
-      console.error("Get Current Subscription Error:", error);
+      if (error.response?.status !== 404) {
+        console.error("Get Current Subscription Error:", error);
+      }
       throw error;
     }
   },

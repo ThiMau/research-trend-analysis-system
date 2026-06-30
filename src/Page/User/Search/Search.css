@@ -240,3 +240,105 @@
 .filter-bar button{
     height:42px;
 }
+
+/* PAGINATION - Edge Style (Sticky / Centered at bottom) */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 40px;
+  padding: 12px 20px;
+  border-top: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  min-width: 34px;
+  height: 34px;
+  border: 1px solid #e2e8f0;
+  background-color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f2f66;
+}
+
+.pagination button.active {
+  background-color: #0f2f66;
+  border-color: #0f2f66;
+  color: white;
+  font-weight: 600;
+}
+
+.pagination button:disabled {
+  background-color: #f8fafc;
+  border-color: #f1f5f9;
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.sort-container {
+  position: relative;
+}
+
+.sort-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  width: 120px;
+  overflow: hidden;
+}
+
+.sort-dropdown-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-align: left;
+}
+
+.sort-dropdown-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.sort-dropdown-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 500;
+}

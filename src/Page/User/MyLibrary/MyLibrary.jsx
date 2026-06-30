@@ -1,6 +1,7 @@
 import "./MyLibrary.css";
 import { useState } from "react";
 import Folder from "../../../components/Folder/Folder";
+import bookmarkService from "../../../Services/bookmarkService";
 
 export default function MyLibrary() {
 
@@ -10,6 +11,31 @@ export default function MyLibrary() {
     const handleFolderChange = (folder, paperList) => {
         setSelectedFolder(folder);
         setPapers(paperList);
+    };
+
+    const handleEditNote = async (paper) => {
+        const newNote = window.prompt("Edit Note for: " + paper.title, paper.note || "");
+        if (newNote !== null) {
+            try {
+                await bookmarkService.updateNote(paper.bookmarkId, newNote.trim());
+                setPapers(prev => prev.map(p => p.bookmarkId === paper.bookmarkId ? { ...p, note: newNote.trim() } : p));
+            } catch (err) {
+                console.error(err);
+                alert("Failed to update note");
+            }
+        }
+    };
+
+    const handleRemovePaper = async (bookmarkId) => {
+        if (window.confirm("Are you sure you want to remove this paper from the folder?")) {
+            try {
+                await bookmarkService.removeBookmark(bookmarkId);
+                setPapers(prev => prev.filter(p => p.bookmarkId !== bookmarkId));
+            } catch (err) {
+                console.error(err);
+                alert("Failed to remove paper");
+            }
+        }
     };
 
 
@@ -139,22 +165,19 @@ export default function MyLibrary() {
 
 
 
-                                            <td>
-
+                                            <td className="library-actions-cell">
                                                 <button
                                                     className="library-edit-btn"
+                                                    onClick={() => handleEditNote(paper)}
                                                 >
                                                     Edit Note
                                                 </button>
-
-
                                                 <button
                                                     className="library-remove-btn"
+                                                    onClick={() => handleRemovePaper(paper.bookmarkId)}
                                                 >
                                                     Remove
                                                 </button>
-
-
                                             </td>
 
 

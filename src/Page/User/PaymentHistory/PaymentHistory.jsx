@@ -18,7 +18,7 @@ export default function PaymentHistory() {
 
       const response = await paymentService.getPaymentHistory();
 
-      if (response.code === 0) {
+      if (response.code === 1000 || response.code === 0) {
         setHistory(response.result);
       }
     } catch (error) {

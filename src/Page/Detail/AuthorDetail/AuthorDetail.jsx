@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import userService from "../../../Services/userService";
 import "./AuthorDetail.css";
 
 function AuthorDetail() {
   const { authorId } = useParams();
+  const navigate = useNavigate();
 
   const [author, setAuthor] = useState(null);
   const [isFollowed,setIsFollowed]=useState(false);
@@ -81,29 +82,18 @@ item.authorId===Number(authorId)
       setLoading(false);
     }
   };
-const handleFollow = async()=>{
-
-try{
-
-if(isFollowed){
-
-await userService.unfollowAuthor(authorId);
-
-}else{
-
-await userService.followAuthor(authorId);
-
-}
-
-setIsFollowed(!isFollowed);
-
-}catch(err){
-
-console.log(err);
-
-}
-
-}
+  const handleFollow = async () => {
+    try {
+      if (isFollowed) {
+        await userService.unfollowAuthor(Number(authorId));
+      } else {
+        await userService.followAuthor(Number(authorId));
+      }
+      setIsFollowed(!isFollowed);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   if (loading) {
     return (
       <div className="author-loading">
@@ -132,30 +122,24 @@ console.log(err);
 
   return (
     <div className="author-detail">
+      <div className="header-buttons">
+        <button className="back-button" onClick={() => navigate(-1)}>
+          ← Back
+        </button>
+        <button
+          className={isFollowed ? "follow-btn followed" : "follow-btn"}
+          onClick={handleFollow}
+        >
+          {isFollowed ? "Unfollow" : "Follow Author"}
+        </button>
+      </div>
+
       <div className="author-header">
         <div className="author-avatar">
           {author.fullName
             ?.charAt(0)
             ?.toUpperCase()}
         </div>
-            <div className="author-actions">
-
-            <button
-            className={
-            isFollowed
-            ? "follow-btn followed"
-            : "follow-btn"
-            }
-            onClick={handleFollow}
-            >
-
-            {isFollowed
-            ? "Unfollow"
-            : "Follow Author"}
-
-            </button>
-
-            </div>
         <div>
           <h1>{author.fullName}</h1>
 

@@ -64,31 +64,16 @@ const JournalDetail = () => {
   };
 
   const handleFollow = async () => {
-
     try {
-
       if (isFollowed) {
-
-        await userService.unfollowJournal(
-          journalId
-        );
-
+        await userService.unfollowJournal(Number(journalId));
       } else {
-
-        await userService.followJournal(
-          journalId
-        );
-
+        await userService.followJournal(Number(journalId));
       }
-
       setIsFollowed(!isFollowed);
-
     } catch (err) {
-
       console.log(err);
-
     }
-
   };
 
   if (loading) {
@@ -111,14 +96,10 @@ const JournalDetail = () => {
 
   return (
     <div className="journal-page">
-      <div className="header-top">
-
-        <button className="back-button">
-
+      <div className="header-buttons">
+        <button className="back-button" onClick={() => navigate(-1)}>
           ← Back
-
         </button>
-
         <button
           className={
             isFollowed
@@ -131,7 +112,6 @@ const JournalDetail = () => {
             ? "Unfollow"
             : "Follow Journal"}
         </button>
-
       </div>
       <h1>{journal.name || journal.title}</h1>
 

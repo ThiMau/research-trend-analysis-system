@@ -30,7 +30,7 @@ export default function Payment() {
         invoice.invoiceId
       );
 
-      if (response.code === 0) {
+      if (response.code === 1000 || response.code === 0) {
         setPayment(response.result);
       }
     } catch (error) {
@@ -87,19 +87,13 @@ export default function Payment() {
       {payment && (
         <div className="payment-card">
 
-          <img
-            src={payment.qrCode}
-            alt="QR Code"
-            className="payment-qr"
-          />
-
           <button
             className="checkout-btn"
             onClick={() =>
               window.open(payment.checkoutUrl, "_blank")
             }
           >
-            Open Checkout
+            Pay
           </button>
 
           <button

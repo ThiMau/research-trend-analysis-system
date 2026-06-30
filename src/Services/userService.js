@@ -96,33 +96,52 @@ const userService = {
   },
 
   // ======================
+  // TOPICS
+  // ======================
+
+  getTopicById: async (topicId) => {
+    const response = await axiosClient.get(
+      `/api/member/topics/${topicId}`
+    );
+    return response.data;
+  },
+
+  getTopics: async (params = {}) => {
+    const response = await axiosClient.get(
+      "/api/member/topics",
+      { params }
+    );
+    return response.data;
+  },
+
+  // ======================
   // FOLLOW
   // ======================
 
   getFollowTopics: async () => {
     const response = await axiosClient.get(
-      "/api/member/follow/topics"
+      "/follow/topics"
     );
     return response.data;
   },
 
   getFollowAuthors: async () => {
     const response = await axiosClient.get(
-      "/api/member/follow/authors"
+      "/follow/authors"
     );
     return response.data;
   },
 
   getFollowJournals: async () => {
     const response = await axiosClient.get(
-      "/api/member/follow/journals"
+      "/follow/journals"
     );
     return response.data;
   },
 
   followTopic: async (topicId) => {
     const response = await axiosClient.post(
-      "/api/member/follow/topics",
+      "/follow/topics",
       {
         topicId,
       }
@@ -132,14 +151,14 @@ const userService = {
 
   unfollowTopic: async (topicId) => {
     const response = await axiosClient.delete(
-      `/api/member/follow/topics/${topicId}`
+      `/follow/topics/${topicId}`
     );
     return response.data;
   },
 
   followAuthor: async (authorId) => {
     const response = await axiosClient.post(
-      "/api/member/follow/authors",
+      "/follow/authors",
       {
         authorId,
       }
@@ -149,14 +168,14 @@ const userService = {
 
   unfollowAuthor: async (authorId) => {
     const response = await axiosClient.delete(
-      `/api/member/follow/authors/${authorId}`
+      `/follow/authors/${authorId}`
     );
     return response.data;
   },
 
   followJournal: async (journalId) => {
     const response = await axiosClient.post(
-      "/api/member/follow/journals",
+      "/follow/journals",
       {
         journalId,
       }
@@ -166,7 +185,7 @@ const userService = {
 
   unfollowJournal: async (journalId) => {
     const response = await axiosClient.delete(
-      `/api/member/follow/journals/${journalId}`
+      `/follow/journals/${journalId}`
     );
     return response.data;
   },

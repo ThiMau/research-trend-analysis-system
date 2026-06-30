@@ -2,6 +2,8 @@ import './Dashboard.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userService from '../../../Services/userService';
+import premiumService from '../../../Services/premiumService';
+import bookmarkService from '../../../Services/bookmarkService';
 import Chart from '../../../components/Chart/Chart';
 
 function StatCard({ label, value }) {
@@ -38,6 +40,7 @@ function PaperCard({ paper }) {
 }
 
 export default function Dashboard() {
+	const navigate = useNavigate();
 	const [user, setUser] = useState(null);
 
 	const [totalPapers, setTotalPapers] = useState(0);
@@ -74,17 +77,24 @@ export default function Dashboard() {
 					authors,
 					journals,
 					trends,
-					sub
+					sub,
+					suggestedRes
 				] = await Promise.all([
-					userService.getMe(),
-					userService.getFollowTopics(),
-					userService.getFollowAuthors(),
-					userService.getFollowJournals(),
-					userService.getPublicationTrend(),
-					userService.getCurrentSubscription()
+					userService.getMe().catch(err => { console.error("getMe failed", err); return null; }),
+					userService.getFollowTopics().catch(err => { console.error("getFollowTopics failed", err); return { result: [] }; }),
+					userService.getFollowAuthors().catch(err => { console.error("getFollowAuthors failed", err); return { result: [] }; }),
+					userService.getFollowJournals().catch(err => { console.error("getFollowJournals failed", err); return { result: [] }; }),
+					userService.getPublicationTrend().catch(err => { console.error("getPublicationTrend failed", err); return { result: [] }; }),
+					premiumService.getCurrentSubscription().catch(err => {
+						if (err.response?.status !== 404) {
+							console.error("getCurrentSubscription failed", err);
+						}
+						return null;
+					}),
+					userService.getPapers({ page: 0, size: 5 }).catch(err => { console.error("getPapers failed", err); return { result: { content: [] } }; })
 				]);
 
-				setUser(me?.result || null);
+				setUser(me?.result || me || null);
 				setFollowTopics(topics?.result || []);
 
 				setFollowAuthors(authors?.result || []);
@@ -93,7 +103,26 @@ export default function Dashboard() {
 
 				setSubscription(sub?.result || null);
 				setPublicationTrends(trends?.result || []);
+				
+				const suggestedList = suggestedRes?.result?.content || suggestedRes?.result || [];
+				setSuggested(suggestedList);
+				setTotalPapers(suggestedRes?.result?.totalElements || suggestedList.length || 0);
 
+				// Calculate Saved Publications count from folders
+				try {
+					const foldersRes = await bookmarkService.getFolders();
+					const foldersList = foldersRes.data?.result || [];
+					const papersPromises = foldersList.map(folder =>
+						bookmarkService.getFolderPapers(folder.folderId)
+							.then(res => res.data?.result || [])
+							.catch(() => [])
+					);
+					const papersLists = await Promise.all(papersPromises);
+					const totalSaved = papersLists.reduce((sum, list) => sum + list.length, 0);
+					setSavedPapers(totalSaved);
+				} catch (err) {
+					console.error("Failed to calculate saved papers count", err);
+				}
 			}
 			catch (err) {
 
@@ -164,6 +193,8 @@ export default function Dashboard() {
 									<button
 										key={topic.topicId}
 										className="topic-tag"
+										onClick={() => navigate(`/topics/${topic.topicId}`)}
+										style={{ cursor: 'pointer' }}
 									>
 										{topic.topicName}
 									</button>
@@ -190,12 +221,14 @@ export default function Dashboard() {
 									<div
 										key={author.authorId}
 										className="history-item"
+										onClick={() => navigate(`/authors/${author.authorId}`)}
+										style={{ cursor: 'pointer' }}
 									>
 
 										<span>👤</span>
 
 										<span className="history-name">
-											{author.fullName}
+											{author.authorName}
 										</span>
 
 									</div>
@@ -222,12 +255,14 @@ export default function Dashboard() {
 									<div
 										key={journal.journalId}
 										className="history-item"
+										onClick={() => navigate(`/journals/${journal.journalId}`)}
+										style={{ cursor: 'pointer' }}
 									>
 
 										<span>📚</span>
 
 										<span className="history-name">
-											{journal.name}
+											{journal.journalName}
 										</span>
 
 									</div>
@@ -238,29 +273,42 @@ export default function Dashboard() {
 
 						</div>
 
-						{/* <div className="panel">
+						<div className="panel">
 
-							<h3>Premium</h3>
+							<h3>Premium Subscription</h3>
 
 							{subscription?.premium ? (
 
 								<div className="premium-info">
 
-									<div className="premium-badge">
-										PREMIUM
+									<div className="premium-badge" style={{ marginBottom: '12px', display: 'inline-block' }}>
+										PREMIUM ACTIVE
 									</div>
 
-									<div>
-										{subscription.packageName}
-									</div>
-
-									<div>
-										Expires:
-									</div>
-
-									<div>
-										{new Date(subscription.endDate).toLocaleDateString()}
-									</div>
+									<table className="premium-table" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '13px' }}>
+										<tbody>
+											<tr style={{ borderBottom: '1px solid #eee' }}>
+												<td style={{ padding: '6px 0', color: '#666' }}>Plan</td>
+												<td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 'bold' }}>{subscription.packageName}</td>
+											</tr>
+											<tr style={{ borderBottom: '1px solid #eee' }}>
+												<td style={{ padding: '6px 0', color: '#666' }}>Status</td>
+												<td style={{ padding: '6px 0', textAlign: 'right', color: '#2e7d32', fontWeight: 'bold' }}>{subscription.status || 'ACTIVE'}</td>
+											</tr>
+											<tr style={{ borderBottom: '1px solid #eee' }}>
+												<td style={{ padding: '6px 0', color: '#666' }}>Start Date</td>
+												<td style={{ padding: '6px 0', textAlign: 'right' }}>
+													{subscription.startDate ? new Date(subscription.startDate).toLocaleDateString() : '-'}
+												</td>
+											</tr>
+											<tr>
+												<td style={{ padding: '6px 0', color: '#666' }}>Expiry Date</td>
+												<td style={{ padding: '6px 0', textAlign: 'right', fontWeight: '500' }}>
+													{subscription.endDate ? new Date(subscription.endDate).toLocaleDateString() : '-'}
+												</td>
+											</tr>
+										</tbody>
+									</table>
 
 								</div>
 
@@ -283,22 +331,9 @@ export default function Dashboard() {
 
 							)}
 
-						</div> */}
-
-						<div className="panel chart-panel">
-							<h3>Publication This Month</h3>
-							<Chart
-								title="Publication Trends"
-								data={publicationTrends}
-							/>
-							<div className="chart-labels">
-								<span>2020</span>
-								<span>2021</span>
-								<span>2022</span>
-								<span>2023</span>
-								<span>2024</span>
-							</div>
 						</div>
+
+
 					</aside>
 
 					<section className="right-col">

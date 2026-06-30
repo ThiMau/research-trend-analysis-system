@@ -71,6 +71,19 @@
     background: none;
     cursor: pointer;
     font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    color: #64748b;
+    transition: background 0.2s;
+}
+
+.folder-menu-button:hover {
+    background: #f1f5f9;
+    color: #1e293b;
 }
 
 

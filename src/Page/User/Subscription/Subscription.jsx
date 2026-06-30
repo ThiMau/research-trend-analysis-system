@@ -18,12 +18,17 @@ export default function Subscription() {
 
       const response = await premiumService.getCurrentSubscription();
 
-      if (response.code === 0) {
+      if (response.code === 1000 || response.code === 0) {
         setSubscription(response.result);
       }
     } catch (error) {
-      console.error(error);
-      alert("Cannot load subscription.");
+      const errCode = error.response?.data?.code;
+      if (errCode === 4101 || error.response?.status === 404) {
+        setSubscription(null);
+      } else {
+        console.error(error);
+        alert("Cannot load subscription.");
+      }
     } finally {
       setLoading(false);
     }

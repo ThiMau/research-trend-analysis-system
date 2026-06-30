@@ -27,7 +27,7 @@ export default function Premium() {
 
       const response = await premiumService.getPremiumPackages();
 
-      if (response.code === 0) {
+      if (response.code === 1000 || response.code === 0) {
         setPackages(response.result);
       }
     } catch (error) {
@@ -54,7 +54,7 @@ export default function Premium() {
         selectedPackage.premiumId
       );
 
-      if (response.code === 0) {
+      if (response.code === 1000 || response.code === 0) {
         navigate("/payment", {
           state: {
             invoice: response.result,
