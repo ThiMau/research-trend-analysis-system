@@ -20,6 +20,12 @@ const adminService = {
     const response = await axiosClient.put(`/api/admin/users/${id}/ban`);
     return response.data;
   },
+
+  getReports: async () => {
+    const response = await axiosClient.get("/api/admin/reports");
+    return response.data;
+  },
+
 };
 
 export default adminService;
