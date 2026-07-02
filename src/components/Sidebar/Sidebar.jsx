@@ -8,6 +8,7 @@ import {
   HelpCircle,
   Headset,
   LogOut,
+  Users,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../../Services/authService";
@@ -16,6 +17,7 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
+  const role = localStorage.getItem("role") || "USER";
 
   const handleLogout = () => {
     authService.logout();
@@ -34,12 +36,11 @@ export default function Sidebar() {
 
         <div>
           <h2>TrendTrack</h2>
-          <span>USER</span>
+          <span>{role}</span>
         </div>
       </div>
 
       <div className="menu">
-
         <div
           className={`menu-item ${isActive("/dashboard") ? "active" : ""}`}
           onClick={() => navigate("/dashboard")}
@@ -80,6 +81,18 @@ export default function Sidebar() {
           <span>Report</span>
         </div>
 
+        {role === "ADMIN" && (
+          <>
+            <div className="menu-divider" />
+            <div
+              className={`menu-item ${isActive("/admin/users") ? "active" : ""}`}
+              onClick={() => navigate("/admin/users")}
+            >
+              <Users size={18} />
+              <span>User Management</span>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="bottom-menu">

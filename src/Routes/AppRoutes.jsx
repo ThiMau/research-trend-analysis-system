@@ -18,6 +18,7 @@ import TopicDetail from "../Page/Detail/TopicDetail/TopicDetail";
 import ResetPassword from "../Page/Authentication/ResetPassword/ResetPassword";
 import Profile from "../Page/User/Profile/Profile";
 import ProtectedRoute from "./ProtectedRoute";
+import UserManagement from "../Page/Admin/UserManagement/UserManagement";
 
 import Sidebar from "../components/Sidebar/Sidebar";
 import SearchBar from "../components/SearchBar/SearchBar";
@@ -263,6 +264,17 @@ function AppRoutes() {
             <ProtectedRoute>
               <MainLayout>
                 <Report />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <MainLayout>
+                <UserManagement />
               </MainLayout>
             </ProtectedRoute>
           }

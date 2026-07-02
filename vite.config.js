@@ -33,6 +33,10 @@ export default defineConfig({
       '/invoices': {
         target: 'http://localhost:8080',
         changeOrigin: true,
+      },
+      '/payments': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
       }
     }
   }

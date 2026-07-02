@@ -90,3 +90,17 @@
   flex-direction: column;
   gap: 8px;
 }
+
+.menu-divider {
+  border-top: 1px solid #d7dce5;
+  margin: 12px 14px;
+}
+
+.menu-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 16px 14px 4px 14px;
+}

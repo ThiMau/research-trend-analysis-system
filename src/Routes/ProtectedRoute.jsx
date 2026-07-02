@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import authService from "../Services/authService";
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, allowedRoles }) {
   const location = useLocation();
   const isAuth = authService.isAuthenticated();
 
@@ -17,6 +17,12 @@ function ProtectedRoute({ children }) {
         }}
       />
     );
+  }
+
+  const role = localStorage.getItem("role");
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    // If not authorized, redirect to dashboard
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
