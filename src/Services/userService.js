@@ -234,6 +234,13 @@ const userService = {
     return response.data;
   },
 
+  getMyReports: async () => {
+    const response = await axiosClient.get(
+      "/api/member/reports/my"
+    );
+    return response.data;
+  },
+
 };
 
 export default userService;

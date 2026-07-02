@@ -91,6 +91,13 @@ export default function Sidebar() {
               <Users size={18} />
               <span>User Management</span>
             </div>
+            <div
+              className={`menu-item ${isActive("/admin/reports") ? "active" : ""}`}
+              onClick={() => navigate("/admin/reports")}
+            >
+              <FileText size={18} />
+              <span>Report Management</span>
+            </div>
           </>
         )}
       </div>
